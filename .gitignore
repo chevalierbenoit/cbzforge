@@ -1,0 +1,36 @@
+
+###> phpunit/phpunit ###
+/phpunit.xml
+/.phpunit.cache/
+###< phpunit/phpunit ###
+
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###
+
+###> project ###
+/.superpowers/
+/var/
+/var/data.db
+/.env.local
+/node_modules/
+/vendor/
+/.idea/
+/AGENTS.md
+/docker-compose.override.yml
+/docs/superpowers/
+/compose.override.yaml
+/config/reference.php
+/.rtk/
+###< project ###
+/qodana.yaml
+
+###> friendsofphp/php-cs-fixer ###
+/.php-cs-fixer.php
+/.php-cs-fixer.cache
+###< friendsofphp/php-cs-fixer ###
+
+###> deptrac ###
+/.deptrac.cache
+###< deptrac ###

@@ -1,0 +1,23 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    _instanceof:
+        App\Scraper\ScraperInterface:
+            tags: ['app.scraper']
+
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+
+    App\Service\ScraperChain:
+        arguments:
+            $scrapers: !tagged_iterator app.scraper
+
+    App\Service\WorkerManager:
+        arguments:
+            $projectDir: '%kernel.project_dir%'

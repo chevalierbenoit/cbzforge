@@ -1,0 +1,11 @@
+.git
+.idea
+.superpowers
+var/data.db
+var/cache
+var/log
+vendor/
+public/assets/
+node_modules
+tests/
+docs/

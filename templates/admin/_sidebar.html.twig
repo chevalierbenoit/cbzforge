@@ -1,0 +1,15 @@
+<div class="sidebar-header">{{ 'sidebar.administration'|trans }}</div>
+{% set admin_items = [
+    {route: 'admin_libraries', icon: '📚', label: 'sidebar.libraries'},
+    {route: 'admin_settings', icon: '⚙', label: 'admin.scrapers'},
+    {route: 'admin_rename_settings', icon: '✏', label: 'admin.rename'},
+    {route: 'admin_conversion_settings', icon: '🔄', label: 'admin.conversion'},
+    {route: 'admin_tasks', icon: '📋', label: 'admin.task_queue'},
+] %}
+{% for item in admin_items %}
+    {% if app.current_route starts with item.route %}
+        <div class="sidebar-item active">{{ item.icon }} {{ item.label|trans }}</div>
+    {% else %}
+        <a href="{{ path(item.route) }}" class="sidebar-item">{{ item.icon }} {{ item.label|trans }}</a>
+    {% endif %}
+{% endfor %}

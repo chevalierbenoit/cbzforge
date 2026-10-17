@@ -1,0 +1,69 @@
+deptrac:
+  paths:
+    - ./src
+  exclude_files:
+    - '#.*test.*#'
+  layers:
+    - name: Controller
+      collectors:
+        - type: classLike
+          value: .*Controller.*
+    - name: Entity
+      collectors:
+        - type: classLike
+          value: .*\\Entity\\.*
+    - name: Repository
+      collectors:
+        - type: classLike
+          value: .*Repository.*
+    - name: Service
+      collectors:
+        - type: classLike
+          value: .*\\Service\\.*
+    - name: Dto
+      collectors:
+        - type: classLike
+          value: .*\\Dto\\.*
+    - name: Model
+      collectors:
+        - type: classLike
+          value: .*\\Model\\.*
+    - name: Scraper
+      collectors:
+        - type: classLike
+          value: .*\\Scraper\\.*
+    - name: Twig
+      collectors:
+        - type: classLike
+          value: .*\\Twig\\.*
+    - name: ApiResource
+      collectors:
+        - type: classLike
+          value: .*\\ApiResource\\.*
+  ruleset:
+    Controller:
+      - Service
+      - Dto
+      - Twig
+      - Entity
+      - Model
+      - Scraper
+    Service:
+      - Entity
+      - Repository
+      - Model
+      - Dto
+      - Scraper
+    Scraper:
+      - Model
+      - Dto
+      - Service
+    Twig:
+      - Service
+    ApiResource:
+      - Entity
+      - Dto
+    Entity:
+      - Model
+    Repository:
+      - Entity

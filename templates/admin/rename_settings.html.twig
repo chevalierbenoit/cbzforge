@@ -1,0 +1,71 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'admin.rename.expression'|trans }} — ComicsScraper{% endblock %}
+
+{% block sidebar %}
+    {{ include('admin/_sidebar.html.twig') }}
+{% endblock %}
+
+{% block body %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>{{ 'admin.rename.expression'|trans }}</h1>
+    </div>
+
+    <div data-turbo-cache="false" data-controller="rename-preview">
+    <form method="post" action="{{ path('admin_rename_settings') }}" data-turbo="false">
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <span class="settings-card-title">{{ 'admin.rename.expression'|trans }}</span>
+            </div>
+
+            <div class="form-group">
+                <label for="rename-expression">{{ 'admin.rename.expression_label'|trans }}</label>
+                <input type="text" id="rename-expression" name="expression"
+                       value="{{ expression }}"
+                       data-rename-preview-target="input"
+                       data-action="input->rename-preview#preview"
+                       style="width: 100%; font-family: monospace; padding: 0.5rem;"
+                       placeholder="{serie}/{numero} - {titre}">
+            </div>
+
+            <div class="form-group">
+                <label>{{ 'admin.rename.preview_label'|trans }}</label>
+                <div id="rename-preview" data-rename-preview-target="output"
+                     style="padding: 0.5rem; background: var(--bg-secondary); border-radius: 4px; font-family: monospace; min-height: 1.5rem;">
+                    {{ preview }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>{{ 'admin.rename.available_aliases'|trans }}</label>
+                <div style="max-height: 300px; overflow-y: auto; border: 1px solid var(--border); border-radius: 4px;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background: var(--bg-secondary); position: sticky; top: 0;">
+                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--border);">{{ 'admin.rename.alias'|trans }}</th>
+                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--border);">{{ 'admin.rename.field'|trans }}</th>
+                                <th style="padding: 0.5rem; text-align: left; border-bottom: 1px solid var(--border);">{{ 'admin.rename.description'|trans }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for alias in aliases %}
+                            <tr>
+                                <td style="padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--border); font-family: monospace;">{{ alias.alias }}</td>
+                                <td style="padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--border);"><code>{{ alias.field }}</code></td>
+                                <td style="padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--border);">{{ alias.description }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+            <button type="submit" class="btn btn-primary">{{ 'admin.save'|trans }}</button>
+        </div>
+    </form>
+    </div>
+</div>
+{% endblock %}

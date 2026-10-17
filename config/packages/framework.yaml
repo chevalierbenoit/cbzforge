@@ -1,0 +1,6 @@
+framework:
+    secret: '%env(APP_SECRET)%'
+    session: true
+    assets: true
+    set_locale_from_accept_language: true
+    set_content_language_from_locale: true

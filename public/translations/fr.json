@@ -1,0 +1,13 @@
+{
+    "js.status_bar.no_tasks": "Aucune tâche récente.",
+    "js.tasks.status.pending": "En attente",
+    "js.tasks.status.processing": "En cours",
+    "js.tasks.status.completed": "Terminé",
+    "js.tasks.status.failed": "Échoué",
+    "js.tasks_admin.worker_active": "Worker actif",
+    "js.tasks_admin.worker_inactive": "Worker inactif",
+    "js.tasks_admin.confirm_restart": "Redémarrer le worker ?",
+    "js.tasks_admin.confirm_delete": "Supprimer cette tâche ?",
+    "js.tasks_admin.confirm_retry": "Réessayer cette tâche ?",
+    "js.tasks_admin.confirm_purge": "Purger toutes les tâches terminées et échouées ?"
+}

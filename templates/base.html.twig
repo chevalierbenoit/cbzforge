@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="{{ app.request.locale }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ComicsScraper{% endblock %}</title>
+    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    {% block stylesheets %}{% endblock %}
+    {{ importmap('app') }}
+</head>
+<body>
+    <div class="app-layout">
+        <div class="app-body">
+            <nav class="icon-bar">
+                <a href="{{ path('dashboard') }}" class="icon-bar-logo">CS</a>
+                <a href="{{ path('dashboard') }}" class="icon-bar-item{{ app.current_route == 'dashboard' ? ' active' : '' }}" title="{{ 'nav.dashboard'|trans }}">⌂</a>
+                <a href="{{ path('admin_libraries') }}" class="icon-bar-item{{ app.current_route starts with 'admin_libraries' or app.current_route starts with 'admin_settings' ? ' active' : '' }}" title="{{ 'nav.administration'|trans }}">⚙</a>
+                <div class="icon-bar-spacer"></div>
+            </nav>
+
+            <aside class="sidebar">
+                {% block sidebar %}
+                <div class="sidebar-header">{{ 'sidebar.navigation'|trans }}</div>
+                {% endblock %}
+            </aside>
+
+            <main class="main-content">
+                <turbo-frame id="flash">
+                    {% for type, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="flash flash-{{ type }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endfor %}
+                </turbo-frame>
+                {% block body %}{% endblock %}
+            </main>
+        </div>
+        <div class="status-bar-wrapper" data-controller="status-bar"
+             data-status-bar-locale-value="{{ app.request.locale }}"
+             data-action="mouseenter->status-bar#showPanel mouseleave->status-bar#hidePanelWithDelay">
+            <div class="status-bar-panel" data-status-bar-target="panel"
+                 data-action="mouseenter->status-bar#keepPanel mouseleave->status-bar#hidePanelWithDelay">
+                <div class="status-bar-panel-header">
+                    {{ 'status_bar.queue'|trans }}
+                    <a href="{{ path('admin_tasks') }}" class="status-bar-panel-link">{{ 'status_bar.see_all'|trans }}</a>
+                </div>
+                <div class="status-bar-panel-body" data-status-bar-target="body"></div>
+            </div>
+            <div id="status-bar" class="status-bar" data-action="click->status-bar#togglePanel">
+                <span id="status-bar-text" class="status-bar-text"></span>
+                <span class="status-bar-badge" data-status-bar-target="badge" hidden></span>
+            </div>
+        </div>
+    </div>
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

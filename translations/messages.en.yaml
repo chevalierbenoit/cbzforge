@@ -1,0 +1,128 @@
+# Navigation
+nav.dashboard: Home
+nav.administration: Administration
+
+# Sidebar
+sidebar.navigation: Navigation
+sidebar.libraries: Libraries
+sidebar.administration: Administration
+
+# Dashboard
+dashboard.my_libraries: My libraries
+dashboard.manage: Manage
+dashboard.no_libraries: No libraries configured.
+dashboard.configure_library: Configure a library
+dashboard.libraries: Libraries
+dashboard.browse: Browse
+
+# Explore
+explore.root: Root
+explore.back: '← Back'
+explore.search: Search
+explore.rename: Rename
+explore.convert_to_cbz: Convert to CBZ
+explore.no_files: No files in this folder.
+explore.select_file: Select a file to view its metadata
+explore.file: file
+explore.folder: folder
+explore.close: Close
+
+# Admin — Libraries
+admin.libraries.manage: Library management
+admin.scrapers: Scrapers
+admin.rename: Renaming
+admin.add_library: Add a library
+admin.browse: Browse
+admin.conversion: Conversion
+admin.task_queue: Task queue
+admin.name_placeholder: 'Name (e.g. Manga)'
+admin.path_placeholder: 'Path (e.g. /mnt/Books/Manga)'
+admin.add: '+ Add'
+admin.edit: Edit
+admin.delete: Delete
+admin.confirm_delete: Delete this library?
+admin.no_libraries: No libraries configured.
+
+# Admin — Library edit
+admin.edit_library.back: '← Back'
+admin.edit_library.name: Name
+admin.edit_library.path: Path
+admin.edit_library_title: Edit library
+admin.save: Save
+admin.cancel: Cancel
+
+# Admin — Settings
+admin.settings.scrapers: Scraper configuration
+admin.settings.active: Active
+admin.settings.inactive: Inactive
+admin.settings.no_config: No configuration required.
+
+# Admin — Rename settings
+admin.rename.expression: Renaming expression
+admin.rename.expression_label: Expression
+admin.rename.preview_label: Preview
+admin.rename.available_aliases: Available aliases
+admin.rename.alias: Alias
+admin.rename.field: Field
+admin.rename.description: Description
+
+# Admin — Conversion settings
+admin.conversion.title: PDF → CBZ conversion
+admin.conversion.pdf_quality: PDF extraction quality
+admin.conversion.image_format: Image format
+admin.conversion.dpi: Resolution (DPI)
+admin.conversion.saved: Conversion settings saved.
+
+# Admin — Tasks
+admin.tasks.title: Task queue
+admin.tasks.worker: Worker…
+admin.tasks.restart_worker: ⟳ Restart worker
+admin.tasks.purge_completed_failed: 🧹 Purge completed/failed
+admin.tasks.type: Type
+admin.tasks.file: File
+admin.tasks.status: Status
+admin.tasks.error: Error
+admin.tasks.created_at: Created at
+admin.tasks.actions: Actions
+admin.tasks.none: No tasks.
+tasks.status.pending: Pending
+tasks.status.processing: Processing
+tasks.status.completed: Completed
+tasks.status.failed: Failed
+
+# Flash messages
+admin.library_added: Library added.
+admin.library_updated: Library updated.
+admin.library_deleted: Library deleted.
+admin.settings_saved: Settings saved.
+admin.rename_saved: Renaming expression saved.
+
+# Errors
+error.library_not_found: Library not found
+error.path_not_exist: 'The path "%path%" does not exist or is not a directory.'
+error.path_already_used: 'The path "%path%" is already used by library "%library%".'
+error.scraper_not_found: 'Scraper "%name%" not found or disabled'
+error.connection_error: 'Connection error: %message%'
+error.file_already_cbz: This file is already in CBZ format
+error.file_already_exists: A file with this name already exists
+error.rename_failed: Unable to rename the file
+error.no_metadata: No metadata. Please scrape first.
+
+# SVG error cover
+error_cover.archive: Archive
+error_cover.corrupted: corrupted
+error_cover.unreadable: Unreadable file
+
+# Form errors (API JSON responses)
+error.query_scraper_required: 'query and scraper required'
+error.url_required: 'url required'
+error.no_scraper_for_url: No scraper supports this URL
+error.scraper_disabled: This scraper is disabled
+error.confirm_fields_required: 'confirm_identifier, scraper and library_id required'
+error.library_id_required: 'library_id required'
+error.new_name_required: 'new_name is required'
+error.rename_failed_to: 'Unable to rename to: %path%'
+
+# Status bar
+status_bar.queue: Task queue
+status_bar.see_all: 'See all →'

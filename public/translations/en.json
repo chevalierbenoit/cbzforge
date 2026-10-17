@@ -1,0 +1,13 @@
+{
+    "js.status_bar.no_tasks": "No recent tasks.",
+    "js.tasks.status.pending": "Pending",
+    "js.tasks.status.processing": "Processing",
+    "js.tasks.status.completed": "Completed",
+    "js.tasks.status.failed": "Failed",
+    "js.tasks_admin.worker_active": "Worker active",
+    "js.tasks_admin.worker_inactive": "Worker inactive",
+    "js.tasks_admin.confirm_restart": "Restart the worker?",
+    "js.tasks_admin.confirm_delete": "Delete this task?",
+    "js.tasks_admin.confirm_retry": "Retry this task?",
+    "js.tasks_admin.confirm_purge": "Purge all completed and failed tasks?"
+}

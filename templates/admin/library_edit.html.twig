@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'admin.edit_library_title'|trans }} — ComicsScraper{% endblock %}
+
+{% block sidebar %}
+    {{ include('admin/_sidebar.html.twig') }}
+{% endblock %}
+
+{% block body %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>{{ 'admin.edit_library_title'|trans }}</h1>
+        <a href="{{ path('admin_libraries') }}" class="btn btn-secondary">{{ 'admin.edit_library.back'|trans }}</a>
+    </div>
+
+    <div class="settings-card">
+        <form method="POST" class="settings-form" style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label for="name" style="font-size: 0.85rem; color: var(--text-subtle);">{{ 'admin.edit_library.name'|trans }}</label>
+                <input type="text" id="name" name="name" value="{{ library.name }}" required style="flex: 1;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.4rem;">
+                <label for="path" style="font-size: 0.85rem; color: var(--text-subtle);">{{ 'admin.edit_library.path'|trans }}</label>
+                <input type="text" id="path" name="path" value="{{ library.path }}" required style="flex: 1;">
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button type="submit" class="btn btn-primary">{{ 'admin.save'|trans }}</button>
+                <a href="{{ path('admin_libraries') }}" class="btn btn-secondary">{{ 'admin.cancel'|trans }}</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,128 @@
+# Navigation
+nav.dashboard: Accueil
+nav.administration: Administration
+
+# Sidebar
+sidebar.navigation: Navigation
+sidebar.libraries: Bibliothèques
+sidebar.administration: Administration
+
+# Dashboard
+dashboard.my_libraries: Mes bibliothèques
+dashboard.manage: Gérer
+dashboard.no_libraries: Aucune bibliothèque configurée.
+dashboard.configure_library: Configurer une bibliothèque
+dashboard.libraries: Bibliothèques
+dashboard.browse: Parcourir
+
+# Explore
+explore.root: Racine
+explore.back: ← Retour
+explore.search: Rechercher
+explore.rename: Renommer
+explore.convert_to_cbz: Convertir en CBZ
+explore.no_files: Aucun fichier dans ce dossier.
+explore.select_file: Sélectionnez un fichier pour voir ses métadonnées
+explore.file: fichier
+explore.folder: dossier
+explore.close: Fermer
+
+# Admin — Libraries
+admin.libraries.manage: Gestion des bibliothèques
+admin.scrapers: Scrapers
+admin.rename: Renommage
+admin.add_library: Ajouter une bibliothèque
+admin.browse: Parcourir
+admin.conversion: Conversion
+admin.task_queue: File d'attente
+admin.name_placeholder: 'Nom (ex: Manga)'
+admin.path_placeholder: 'Chemin (ex: /mnt/Livre/Manga)'
+admin.add: '+ Ajouter'
+admin.edit: Modifier
+admin.delete: Supprimer
+admin.confirm_delete: Supprimer cette bibliothèque ?
+admin.no_libraries: Aucune bibliothèque configurée.
+
+# Admin — Library edit
+admin.edit_library.back: ← Retour
+admin.edit_library.name: Nom
+admin.edit_library.path: Chemin
+admin.edit_library_title: Modifier la bibliothèque
+admin.save: Enregistrer
+admin.cancel: Annuler
+
+# Admin — Settings
+admin.settings.scrapers: Configuration des scrapers
+admin.settings.active: Actif
+admin.settings.inactive: Inactif
+admin.settings.no_config: Aucune configuration requise.
+
+# Admin — Rename settings
+admin.rename.expression: Expression de renommage
+admin.rename.expression_label: Expression
+admin.rename.preview_label: Aperçu
+admin.rename.available_aliases: Alias disponibles
+admin.rename.alias: Alias
+admin.rename.field: Champ
+admin.rename.description: Description
+
+# Admin — Conversion settings
+admin.conversion.title: Conversion PDF → CBZ
+admin.conversion.pdf_quality: Qualité d'extraction PDF
+admin.conversion.image_format: Format d'image
+admin.conversion.dpi: Résolution (DPI)
+admin.conversion.saved: Configuration de conversion enregistrée.
+
+# Admin — Tasks
+admin.tasks.title: File d'attente
+admin.tasks.worker: Worker…
+admin.tasks.restart_worker: ⟳ Redémarrer le worker
+admin.tasks.purge_completed_failed: 🧹 Purger terminées/échouées
+admin.tasks.type: Type
+admin.tasks.file: Fichier
+admin.tasks.status: Statut
+admin.tasks.error: Erreur
+admin.tasks.created_at: Créé le
+admin.tasks.actions: Actions
+admin.tasks.none: Aucune tâche.
+tasks.status.pending: En attente
+tasks.status.processing: En cours
+tasks.status.completed: Terminé
+tasks.status.failed: Échoué
+
+# Flash messages
+admin.library_added: Bibliothèque ajoutée.
+admin.library_updated: Bibliothèque mise à jour.
+admin.library_deleted: Bibliothèque supprimée.
+admin.settings_saved: Configuration enregistrée.
+admin.rename_saved: Expression de renommage enregistrée.
+
+# Errors
+error.library_not_found: Bibliothèque non trouvée
+error.path_not_exist: 'Le chemin "%path%" n''existe pas ou n''est pas un dossier.'
+error.path_already_used: 'Le chemin "%path%" est déjà utilisé par la bibliothèque "%library%".'
+error.scraper_not_found: 'Scraper "%name%" non trouvé ou désactivé'
+error.connection_error: 'Erreur de connexion : %message%'
+error.file_already_cbz: Ce fichier est déjà au format CBZ
+error.file_already_exists: Un fichier avec ce nom existe déjà
+error.rename_failed: Impossible de renommer le fichier
+error.no_metadata: Aucune métadonnée. Veuillez d'abord scraper.
+
+# SVG error cover
+error_cover.archive: Archive
+error_cover.corrupted: corrompue
+error_cover.unreadable: Fichier illisible
+
+# Form errors (API JSON responses)
+error.query_scraper_required: 'query et scraper requis'
+error.url_required: 'url requise'
+error.no_scraper_for_url: Aucun scraper ne supporte cette URL
+error.scraper_disabled: Ce scraper est désactivé
+error.confirm_fields_required: 'confirm_identifier, scraper et library_id requis'
+error.library_id_required: 'library_id requis'
+error.new_name_required: 'new_name est requis'
+error.rename_failed_to: 'Impossible de renommer vers : %path%'
+
+# Status bar
+status_bar.queue: File d'attente
+status_bar.see_all: 'Voir tout →'

@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'admin.conversion'|trans }} — ComicsScraper{% endblock %}
+
+{% block sidebar %}
+    {{ include('admin/_sidebar.html.twig') }}
+{% endblock %}
+
+{% block body %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>{{ 'admin.conversion.title'|trans }}</h1>
+    </div>
+
+    <form method="post" action="{{ path('admin_conversion_settings') }}">
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <span class="settings-card-title">{{ 'admin.conversion.pdf_quality'|trans }}</span>
+            </div>
+
+            <div class="form-group">
+                <label for="pdf_format">{{ 'admin.conversion.image_format'|trans }}</label>
+                <select id="pdf_format" name="pdf_format" style="width: 100%; padding: 0.5rem;">
+                    <option value="jpeg"{% if pdf_format == 'jpeg' %} selected{% endif %}>JPEG</option>
+                    <option value="png"{% if pdf_format == 'png' %} selected{% endif %}>PNG</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="pdf_dpi">{{ 'admin.conversion.dpi'|trans }}</label>
+                <select id="pdf_dpi" name="pdf_dpi" style="width: 100%; padding: 0.5rem;">
+                    <option value="150"{% if pdf_dpi == '150' %} selected{% endif %}>150 DPI</option>
+                    <option value="300"{% if pdf_dpi == '300' %} selected{% endif %}>300 DPI</option>
+                </select>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+            <button type="submit" class="btn btn-primary">{{ 'admin.save'|trans }}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

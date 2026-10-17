@@ -1,0 +1,50 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'admin.settings.scrapers'|trans }} — ComicsScraper{% endblock %}
+
+{% block sidebar %}
+    {{ include('admin/_sidebar.html.twig') }}
+{% endblock %}
+
+{% block body %}
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>{{ 'admin.settings.scrapers'|trans }}</h1>
+    </div>
+
+    <form method="post" action="{{ path('admin_settings') }}">
+    {% for scraper in scrapers %}
+        {% set scraper_slug = scraper.name|replace({' ': '_'}) %}
+        <div class="settings-card">
+            <div class="settings-card-header">
+                <input type="hidden" name="scraper_enabled_{{ scraper_slug }}" value="0">
+                <input type="checkbox" name="scraper_enabled_{{ scraper_slug }}" id="toggle-{{ scraper_slug }}" value="1"
+                       {% if scraper.enabled %}checked{% endif %}
+                       style="width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer;">
+                <span class="settings-card-title">{{ scraper.name }}</span>
+                {% if scraper.enabled %}
+                    <span class="badge badge-success">{{ 'admin.settings.active'|trans }}</span>
+                {% else %}
+                    <span class="badge badge-neutral">{{ 'admin.settings.inactive'|trans }}</span>
+                {% endif %}
+            </div>
+            {% if scraper.fields is empty %}
+                <p style="color: var(--text-subtle); font-size: 0.8rem;">{{ 'admin.settings.no_config'|trans }}</p>
+            {% else %}
+                {% for field in scraper.fields %}
+                    <div class="form-group">
+                        <label for="settings-{{ field.key }}">{{ field.label }}</label>
+                        <input type="{{ field.type }}" id="settings-{{ field.key }}"
+                               name="{{ field.key }}" value="{{ field.value }}"
+                               {% if field.value %}placeholder="••••••••"{% endif %}>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endfor %}
+        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+            <button type="submit" class="btn btn-primary">{{ 'admin.save'|trans }}</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
