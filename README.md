@@ -1,102 +1,167 @@
-# ComicsScraper
+# cbzforge
 
-Symfony 8 web app for scraping comic metadata, writing **ComicInfo.xml** into CBZ archives, converting CBR/PDF/EPUB to CBZ, and renaming/organizing files by series.
+A Symfony web app to tidy up a comic library:
+
+- scrape album metadata and write **ComicInfo.xml** into CBZ archives,
+- convert **CBR, PDF and EPUB** files to CBZ,
+- rename and organize files into a `Series/TXX - Title.ext` structure.
 
 ## Features
 
-- **Metadata scraping** — Search and scrape album metadata from BDGest (extensible via `ScraperInterface`)
-- **ComicInfo.xml injection** — Write ComicRack-compatible metadata directly into CBZ archives
-- **Format conversion** — Convert CBR, PDF, EPUB to CBZ
-- **File renaming & organization** — Organize files into `Series/TXX - Title.ext` structure
-- **Library browser** — Browse configured library paths via REST API
-- **Docker support** — PHP-FPM + Caddy, ready to deploy
+- **Metadata scraping**: search and scrape album metadata from BDGest and Google Books. More sources can be added through `ScraperInterface`.
+- **ComicInfo.xml injection**: write ComicRack-compatible metadata directly into CBZ archives.
+- **Format conversion**: convert CBR, PDF and EPUB to CBZ, one file or in batch. Jobs run in the background.
+- **Renaming and organization**: rename files with a template and move them into series folders.
+- **Library browser**: browse your libraries from the dashboard, and manage them in the admin.
 
 ## Requirements
 
-- PHP 8.4+
-- SQLite
-- [unrar](https://launchpad.net/ubuntu/+source/unrar) (for CBR conversion)
-- Composer
+Docker is the recommended setup. Without Docker you need:
 
-## Quick Start
+- PHP 8.4 or newer, with the `ctype`, `iconv`, `pdo_sqlite`, `zip` and `gd` extensions
+- Composer
+- For CBR conversion: the `unrar` command line tool, or the PHP `rar` extension
+- For PDF conversion: `pdftoppm` (from poppler-utils)
+
+## Quick start
 
 ### Docker (recommended)
 
 ```bash
+git clone https://github.com/chevalierbenoit/cbzforge.git
+cd cbzforge
 docker compose up -d
 ```
 
-Then open `http://localhost:8080`.
+Open <http://localhost:8080>.
 
-Le premier démarrage exécute automatiquement `composer install`, la création de la base de données, les migrations et `importmap:install`.
+On first start, the container runs `composer install`, creates the database, runs the migrations and installs the importmap assets.
 
 ```bash
-# Suivre les logs
+# Follow the logs
 docker compose logs -f
 
-# Exécuter des commandes dans le container
-docker compose exec -u www-data app php bin/console ...
+# Run a console command inside the container
+docker compose exec app php bin/console <command>
 ```
 
-Le container s'exécute en tant que `www-data` avec son UID/GID automatiquement aligné sur ceux de l'hôte (via `HOST_UID`/`HOST_GID`), ce qui permet d'accéder aux fichiers montés sans conflit de permissions.
+The container runs PHP-FPM, Caddy and the background worker (`messenger:consume`), supervised by supervisord.
 
-### Sans Docker
+The container runs as `www-data`, with its UID and GID aligned on your host user through `HOST_UID` and `HOST_GID`. This keeps the mounted files accessible.
+
+### Without Docker
 
 ```bash
+git clone https://github.com/chevalierbenoit/cbzforge.git
+cd cbzforge
 composer install
-cp .env .env.local  # ajuster APP_ENV=dev si nécessaire
+cp .env .env.local           # then set APP_SECRET, see "Security" below
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
-symfony serve
+symfony serve                # or: php -S 127.0.0.1:8000 -t public
 ```
 
-Puis ouvrir `http://localhost:8000`.
+Open <http://localhost:8000>.
+
+Scraping and conversion jobs run in the background. Start a worker in a second terminal:
+
+```bash
+php bin/console messenger:consume async -vv
+```
 
 ## Usage
 
-1. Add a library path via the admin interface (`/admin/libraries`) or REST API (`/api/libraries`)
-2. Browse your library from the dashboard (`/`)
-3. Scrape metadata from BDGest via the scrape workflow
-4. Confirm metadata write to inject ComicInfo.xml into archives
-5. Preview and execute rename operations
+1. Add a library path in the admin (`/admin/libraries`), or through the REST API (`/api/libraries`).
+2. Browse your libraries from the dashboard (`/`).
+3. Select one or more files, then scrape their metadata.
+4. Confirm the metadata to write ComicInfo.xml into the archives.
+5. Preview and run renames. A CBR or PDF is converted to CBZ when needed.
 
-## API Endpoints
+## Web pages
+
+| Path | Description |
+|------|-------------|
+| `/` | Dashboard, list of libraries |
+| `/library/{id}` | Browse a library folder |
+| `/admin/libraries` | Manage libraries |
+| `/admin/conversion-settings` | PDF conversion settings |
+| `/admin/rename-settings` | Rename template settings |
+| `/admin/settings` | General settings |
+| `/admin/tasks` | Background task history |
+
+## API
+
+The OpenAPI documentation is served at `/api/docs`. The full route list is available with `php bin/console debug:router`.
 
 | Method | Path | Description |
 |--------|------|-------------|
-| `GET` | `/api/libraries` | List libraries (auto CRUD) |
-| `POST` | `/api/files/scrape/search` | Search scrapers for a query |
-| `POST` | `/api/files/scrape/url` | Scrape metadata from a URL |
-| `POST` | `/api/files/scrape/confirm` | Confirm and write scraped metadata |
-| `GET` | `/api/files/scrape/read` | Read existing metadata |
-| `POST` | `/api/files/scrape/update` | Update metadata |
-| `POST` | `/api/files/scrape/delete` | Delete metadata |
-| `GET` | `/api/files/cover` | Get cover image from archive |
-| `POST` | `/api/files/rename/preview` | Preview rename path |
-| `POST` | `/api/files/rename/execute` | Execute rename + convert if needed |
+| `GET` | `/api/libraries` | List libraries |
+| `POST` | `/api/libraries` | Create a library |
+| `GET` | `/api/libraries/{id}` | Get a library |
+| `PUT` | `/api/libraries/{id}` | Update a library |
+| `DELETE` | `/api/libraries/{id}` | Delete a library |
+| `GET` | `/api/files/cover` | Cover image of an archive |
+| `GET` | `/api/files/scrape/read` | Read the existing ComicInfo.xml |
+| `POST` | `/api/files/scrape/search` | Search the scrapers |
+| `POST` | `/api/files/scrape/url` | Scrape an album from a URL |
+| `POST` | `/api/files/scrape/confirm` | Write confirmed metadata into an archive |
+| `POST` | `/api/files/scrape/update` | Update existing metadata |
+| `POST` | `/api/files/scrape/delete` | Remove ComicInfo.xml |
+| `POST` | `/api/files/convert` | Convert one file to CBZ |
+| `POST` | `/api/files/convert/batch` | Convert several files in the background |
+| `POST` | `/api/files/rename/preview` | Preview a rename |
+| `POST` | `/api/files/rename/execute` | Rename, converting first if needed |
+| `POST` | `/api/files/rename-file` | Rename a single file |
+| `GET` | `/api/tasks/list` | List background tasks |
+| `GET` | `/api/tasks/status` | Summary of background tasks |
+| `POST` | `/api/tasks/{id}/retry` | Requeue a failed task |
+| `POST` | `/api/tasks/{id}/delete` | Delete a task |
+| `POST` | `/api/tasks/purge` | Delete finished and failed tasks |
+| `GET` | `/api/worker/status` | Worker heartbeat |
+| `POST` | `/api/worker/restart` | Restart the worker |
+
+## Configuration
+
+| Variable | Description |
+|----------|-------------|
+| `APP_SECRET` | Application secret. Required. |
+| `DATABASE_URL` | Database URL. Defaults to SQLite in `var/data.db`. |
+| `MESSENGER_TRANSPORT_DSN` | Queue transport. Defaults to the Doctrine transport. |
 
 ## Security
 
 - **Local use only.** The app has no authentication and no CSRF protection. Do not expose it to a network you do not trust.
-- **Set your own `APP_SECRET`.** The value in `.env` is a placeholder. Put a real secret in `.env.local` (git-ignored):
+- **Set your own `APP_SECRET`.** The value in `.env` is a placeholder. Put a real secret in `.env.local`, which is git-ignored:
 
   ```bash
   echo "APP_SECRET=$(openssl rand -hex 32)" >> .env.local
   ```
-- **Destination paths are restricted.** Renamed files must stay inside the library they belong to.
 
-## Tests
+- **Paths are restricted.** Files are only read and written inside the libraries you configured. Rename destinations must stay inside the library the file belongs to.
+
+## Development
+
+Run the tests and the checks inside the container, as the project does:
 
 ```bash
-php vendor/bin/phpunit
+docker compose exec app php vendor/bin/phpunit
+docker compose exec app php vendor/bin/phpstan analyse --level=6
+docker compose exec app php vendor/bin/php-cs-fixer fix --dry-run --diff
+docker compose exec app php vendor/bin/deptrac
 ```
+
+Without Docker, drop the `docker compose exec app` prefix.
+
+### Adding a scraper
+
+Create a class in `src/Scraper/` that implements `ScraperInterface`. It is registered automatically with the `app.scraper` tag.
 
 ## Architecture
 
-- **Backend:** Symfony 8 + API Platform 4 (REST) + Doctrine ORM + SQLite
-- **Frontend:** Twig templates + vanilla JS
-- **Scrapers:** Plugin system via `ScraperInterface` — implement and tag with `app.scraper`
+- **Backend:** Symfony 8, API Platform 4, Doctrine ORM, SQLite, Symfony Messenger
+- **Frontend:** Twig templates and vanilla JavaScript (Stimulus, Turbo)
+- **Packaging:** a single Docker image with Caddy, PHP-FPM and a worker
 
 ## License
 
-MIT
+MIT. See [LICENSE](LICENSE).
