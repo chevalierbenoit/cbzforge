@@ -315,7 +315,7 @@ export default class extends Controller {
                             <div class="search-result-info">
                                 <strong>${escapeHtml(r.title)}</strong>
                                 ${r.year ? ` <span style="color: #666;">(${escapeHtml(String(r.year))})</span>` : ''}
-                                ${r.pageUrl ? `<br><a href="${escapeHtml(r.pageUrl)}" data-action="click->${this.identifier}#openLink" target="_blank" class="search-result-link">${escapeHtml(r.pageUrl)}</a>` : ''}
+                                ${r.pageUrl ? `<br><a href="${escapeHtml(r.pageUrl)}" data-action="click->${this.identifier}#openLink" target="_blank" rel="noopener" class="search-result-link">${this.translator.trans('js.scrape.open_page')} ↗</a>` : ''}
                             </div>
                         </li>`;
                 });

@@ -132,5 +132,6 @@
     "js.explore.scrape_failed": "Not found",
     "js.scrape.section_series": "Series and issue",
     "js.scrape.section_credits": "Credits",
-    "js.scrape.section_edition": "Edition and content"
+    "js.scrape.section_edition": "Edition and content",
+    "js.scrape.open_page": "Open page"
 }
