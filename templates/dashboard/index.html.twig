@@ -5,41 +5,58 @@
 
 {% block body %}
 <div class="page">
-    <div class="page-header">
-        <div>
-            <h1>{{ 'dashboard.my_libraries'|trans }}</h1>
-        </div>
-        {% if libraries is not empty %}
+    {% if libraries is empty %}
+        <section class="welcome">
+            <div class="welcome-hero">
+                <span class="welcome-icon">{{ ui.icon('library') }}</span>
+                <h1>{{ 'dashboard.welcome_title'|trans }}</h1>
+                <p class="page-lead">{{ 'dashboard.welcome_lead'|trans }}</p>
+                <a href="{{ path('admin_libraries') }}" class="btn btn-primary btn-lg">{{ ui.icon('plus') }}{{ 'dashboard.add_first'|trans }}</a>
+            </div>
+
+            <ol class="welcome-steps">
+                <li class="card welcome-step">
+                    <span class="welcome-step-number">1</span>
+                    <h2>{{ 'dashboard.step1_title'|trans }}</h2>
+                    <p>{{ 'dashboard.step1_text'|trans }}</p>
+                </li>
+                <li class="card welcome-step">
+                    <span class="welcome-step-number">2</span>
+                    <h2>{{ 'dashboard.step2_title'|trans }}</h2>
+                    <p>{{ 'dashboard.step2_text'|trans }}</p>
+                    <a href="{{ path('admin_settings') }}" class="welcome-step-link">{{ 'dashboard.step2_link'|trans }}</a>
+                </li>
+                <li class="card welcome-step">
+                    <span class="welcome-step-number">3</span>
+                    <h2>{{ 'dashboard.step3_title'|trans }}</h2>
+                    <p>{{ 'dashboard.step3_text'|trans }}</p>
+                </li>
+            </ol>
+        </section>
+    {% else %}
+        <div class="page-header">
+            <div>
+                <h1>{{ 'dashboard.my_libraries'|trans }}</h1>
+            </div>
             <div class="page-actions">
                 <a href="{{ path('admin_libraries') }}" class="btn">{{ ui.icon('settings') }}{{ 'dashboard.manage'|trans }}</a>
             </div>
-        {% endif %}
-    </div>
+        </div>
 
-    {% if libraries is empty %}
-        <div class="card">
-            <div class="empty-state">
-                {{ ui.icon('library') }}
-                <h2>{{ 'dashboard.no_libraries'|trans }}</h2>
-                <p>{{ 'dashboard.empty_hint'|trans }}</p>
-                <a href="{{ path('admin_libraries') }}" class="btn btn-primary">{{ ui.icon('plus') }}{{ 'dashboard.configure_library'|trans }}</a>
-            </div>
-        </div>
-    {% else %}
-        <div class="library-grid">
+        <ul class="library-grid">
             {% for library in libraries %}
-            <article class="library-card">
-                <div class="library-card-head">
+            <li>
+                <a href="{{ path('library_explore', {id: library.id}) }}" class="library-card">
                     <span class="library-card-icon">{{ ui.icon('library') }}</span>
-                    <div class="library-card-info">
-                        <div class="library-card-name">{{ library.name }}</div>
-                        <div class="library-card-path" title="{{ library.path }}">{{ library.path }}</div>
-                    </div>
-                </div>
-                <a href="{{ path('library_explore', {id: library.id}) }}" class="btn btn-primary">{{ ui.icon('folder') }}{{ 'dashboard.browse'|trans }}</a>
-            </article>
+                    <span class="library-card-info">
+                        <span class="library-card-name">{{ library.name }}</span>
+                        <span class="library-card-path" title="{{ library.path }}">{{ library.path }}</span>
+                    </span>
+                    <span class="library-card-go" aria-hidden="true">{{ ui.icon('chevron') }}</span>
+                </a>
+            </li>
             {% endfor %}
-        </div>
+        </ul>
     {% endif %}
 </div>
 {% endblock %}

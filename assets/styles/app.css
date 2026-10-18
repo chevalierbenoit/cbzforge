@@ -1060,26 +1060,32 @@ tr.selected td { background: var(--accent-soft); }
 /* ---------- Dashboard ---------- */
 
 .library-grid {
+    list-style: none;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1rem;
 }
 
+/* The whole card is the link */
 .library-card {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    padding: 1.25rem;
+    align-items: center;
+    gap: 0.875rem;
+    height: 100%;
+    padding: 1.125rem 1.25rem;
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
 }
 
-.library-card-head { display: flex; align-items: center; gap: 0.75rem; min-width: 0; }
+.library-card:hover { border-color: var(--accent); box-shadow: var(--shadow-lg); }
 
 .library-card-icon {
-    width: 40px; height: 40px;
+    width: 44px; height: 44px;
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
@@ -1089,10 +1095,55 @@ tr.selected td { background: var(--accent-soft); }
     color: var(--accent);
 }
 
-.library-card-info { min-width: 0; }
-.library-card-name { font-weight: 600; font-size: 1rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.library-card-info { display: grid; gap: 0.15rem; flex: 1; min-width: 0; }
+.library-card-name { font-weight: 600; font-size: 1.0625rem; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .library-card-path { color: var(--text-3); font-size: 0.8125rem; font-family: var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.library-card .btn { align-self: flex-start; }
+.library-card-go { color: var(--text-3); display: inline-flex; }
+.library-card:hover .library-card-go { color: var(--accent); }
+
+/* Welcome screen (no library yet) */
+.welcome { display: grid; gap: 2rem; max-width: 880px; margin: 0 auto; }
+
+.welcome-hero { display: grid; justify-items: center; gap: 0.75rem; text-align: center; padding-top: 1rem; }
+.welcome-hero h1 { font-size: 1.75rem; }
+.welcome-hero .page-lead { max-width: 56ch; font-size: 1.0625rem; }
+.welcome-hero .btn { margin-top: 0.5rem; }
+
+.welcome-icon {
+    width: 64px; height: 64px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px;
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.welcome-icon .icon { width: 2rem; height: 2rem; }
+
+.welcome-steps {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+}
+
+.welcome-step { padding: 1.25rem; display: grid; gap: 0.5rem; align-content: start; }
+.welcome-step h2 { font-size: 1.0625rem; }
+.welcome-step p { color: var(--text-2); }
+
+.welcome-step-number {
+    width: 30px; height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--accent);
+    color: var(--on-accent);
+    font-weight: 700;
+}
+
+.welcome-step-link { font-weight: 500; justify-self: start; }
 
 /* ---------- Progress toast (bottom) ---------- */
 

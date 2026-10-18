@@ -10,10 +10,6 @@ sidebar.administration: Administration
 # Dashboard
 dashboard.my_libraries: My libraries
 dashboard.manage: Manage
-dashboard.no_libraries: No libraries configured.
-dashboard.configure_library: Configure a library
-dashboard.libraries: Libraries
-dashboard.browse: Browse
 
 # Explore
 explore.root: Root
@@ -142,7 +138,6 @@ admin.settings.not_configured_help: Fill in the required settings and save to en
 admin.tasks.lead: Background jobs such as scraping, conversion and renaming. Retry failed jobs or clear finished ones.
 admin.tasks.delete: Delete task
 admin.tasks.retry: Retry task
-dashboard.empty_hint: Add the folder that contains your comics (CBZ, CBR or PDF). cbzforge reads it in place.
 explore.actions: Actions on the selected files
 explore.folders: Folders
 explore.has_metadata: Metadata
@@ -155,3 +150,15 @@ explore.no_metadata: No metadata
 explore.rename_hint: Rename the selected files with the naming expression
 explore.search_hint: Search metadata for the selected files
 theme.toggle: Switch light / dark theme
+
+# Dashboard welcome screen
+dashboard.welcome_title: Welcome to cbzforge
+dashboard.welcome_lead: cbzforge reads your comic folders, finds their metadata and renames files consistently. Let's set up your first library.
+dashboard.add_first: Add my first library
+dashboard.step1_title: Add a library folder
+dashboard.step1_text: Give the path of a folder that holds your comics (CBZ, CBR or PDF). Files are read in place.
+dashboard.step2_title: Find the metadata
+dashboard.step2_text: Select a comic and search its metadata. Only enabled and configured sources are offered.
+dashboard.step2_link: Check the metadata sources
+dashboard.step3_title: Rename consistently
+dashboard.step3_text: Choose a naming expression. Files are renamed from the library root, into one folder per series.
