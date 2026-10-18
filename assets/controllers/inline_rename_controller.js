@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 import { Translator } from '../translator.js';
+import { csrfFetch } from '../csrf.js';
 
 export default class extends Controller {
     static values = {
@@ -114,7 +115,7 @@ export default class extends Controller {
 
         span.contentEditable = 'false';
 
-        fetch('/api/files/rename-file', {
+        csrfFetch('/api/files/rename-file', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

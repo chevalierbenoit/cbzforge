@@ -134,7 +134,7 @@ The OpenAPI documentation is served at `/api/docs`. The full route list is avail
 
 - **Sign-in required.** Every page and API route needs the administrator's account; the sign-in page is rate limited (5 attempts, then a 15 minute wait). There is no default password.
 - **Single account.** Version 1 has one administrator and no API key. Multiple users and an API key are not implemented.
-- **CSRF is partial.** The sign-in and setup forms and the onboarding assistant check CSRF tokens. The admin forms do not yet; session cookies are `SameSite=Lax`, which blocks most cross-site form posts. Still, do not expose the app to the Internet without a reverse proxy in front.
+- **Requests are checked.** Every request that changes data needs the session's CSRF token (a hidden `_token` field in forms, the `X-CSRF-Token` header for scripts) and must not come from another site (`Origin` check). Session cookies are `SameSite=Lax` as a second layer. Behind a reverse proxy, the host and scheme seen by the app must match the browser's (configure trusted proxies).
 - **Set your own `APP_SECRET`.** The value in `.env` is a placeholder. Put a real secret in `.env.local`, which is git-ignored:
 
   ```bash

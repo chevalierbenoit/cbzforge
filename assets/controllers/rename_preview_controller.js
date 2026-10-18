@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 import { Translator } from '../translator.js';
+import { csrfFetch } from '../csrf.js';
 
 export default class extends Controller {
     static targets = ['input', 'output'];
@@ -27,7 +28,7 @@ export default class extends Controller {
             }
 
             try {
-                const response = await fetch('/admin/rename-template/preview', {
+                const response = await csrfFetch('/admin/rename-template/preview', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ expression }),

@@ -13,6 +13,8 @@
     </div>
 
     <form method="post" action="{{ path('app_onboarding_library') }}" class="card">
+
+        <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
         <div class="card-body">
             <div class="form-grid">
                 <div class="form-group">
@@ -25,7 +27,6 @@
                     <span class="form-help">{{ 'admin.libraries.path_help'|trans }}</span>
                 </div>
             </div>
-            <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
         </div>
         <div class="card-footer">
             <button type="submit" class="btn btn-primary">{{ 'onboarding.library_submit'|trans }}</button>
@@ -33,6 +34,7 @@
     </form>
 
     <form id="skip-onboarding" method="post" action="{{ path('app_onboarding_skip') }}" class="skip-form">
+
         <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
         <button type="submit" class="btn btn-ghost">{{ 'onboarding.skip'|trans }}</button>
     </form>

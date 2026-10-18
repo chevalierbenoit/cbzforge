@@ -16,6 +16,8 @@ trait AdminClientTrait
     protected function createAdminClient(): KernelBrowser
     {
         $client = static::createClient();
+        // Keep one container for the whole test, so a service replaced in it stays replaced.
+        $client->disableReboot();
         $container = $client->getContainer();
         $em = $container->get('doctrine.orm.entity_manager');
 
@@ -37,6 +39,9 @@ trait AdminClientTrait
         }
 
         $client->loginUser($user);
+        // Read the token the way the page's scripts do: from the csrf-token meta tag of a page.
+        $crawler = $client->request('GET', '/admin/libraries');
+        $client->setServerParameter('HTTP_X_CSRF_TOKEN', (string) $crawler->filter('meta[name="csrf-token"]')->attr('content'));
 
         return $client;
     }

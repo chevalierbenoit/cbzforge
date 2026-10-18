@@ -13,6 +13,8 @@
     </div>
 
     <form method="post" action="{{ path('admin_settings') }}" class="stack">
+
+        <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
     {% for scraper in scrapers %}
         {% set scraper_slug = scraper.name|replace({' ': '_'}) %}
         <section class="card">

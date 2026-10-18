@@ -13,6 +13,7 @@
     </div>
 
     <form method="post" action="{{ path('app_onboarding_sources') }}" class="stack" id="sources-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
         {% for source in sources %}
             {% set slug = source.name|replace({' ': '_'}) %}
             <section class="card">
@@ -31,7 +32,6 @@
                 </div>
             </section>
         {% endfor %}
-        <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">{{ 'onboarding.finish'|trans }}</button>
         </div>
