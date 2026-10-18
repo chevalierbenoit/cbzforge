@@ -64,9 +64,18 @@
 
     <div class="library-layout">
         <div class="browser-column" data-controller="inline-rename" data-inline-rename-library-id-value="{{ library.id }}">
+            {% set dirs = entries|filter(e => e.type == 'dir') %}
             {% set files = entries|filter(e => e.type == 'file') %}
-            {% if files is not empty %}
+            {% if files is not empty or dirs is not empty %}
             <div class="file-grid">
+                {% for entry in dirs %}
+                <a class="folder-card" href="{{ path('library_explore', {id: library.id, path: entry.path}) }}">
+                    <div class="folder-card-icon">📁</div>
+                    <div class="file-card-body">
+                        <div class="file-card-name">{{ entry.name }}</div>
+                    </div>
+                </a>
+                {% endfor %}
                 {% for entry in files %}
                 <div class="file-card{{ entry.extension != 'cbz' and entry.extension != '' ? ' file-card-unreadable' : '' }}"
                      data-path="{{ entry.path|e('html_attr') }}"

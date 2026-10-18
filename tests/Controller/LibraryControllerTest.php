@@ -43,6 +43,24 @@ class LibraryControllerTest extends WebTestCase
         $this->assertStringNotContainsString('readme.txt', $crawler->filter('body')->text());
     }
 
+    public function testExploreShowsFoldersInGrid(): void
+    {
+        $client = static::createClient();
+        $em = $client->getContainer()->get('doctrine.orm.entity_manager');
+        $library = new Library();
+        $library->setName('Test');
+        $library->setPath($this->tmpDir);
+        $em->persist($library);
+        $em->flush();
+
+        $crawler = $client->request('GET', '/library/'.$library->getId());
+
+        $folder = $crawler->filter('.file-grid .folder-card');
+        $this->assertCount(1, $folder);
+        $this->assertStringContainsString('Serie A', $folder->text());
+        $this->assertStringEndsWith('path=Serie%20A', $folder->attr('href'));
+    }
+
     public function testExploreWithSubPath(): void
     {
         $client = static::createClient();
