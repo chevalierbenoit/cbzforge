@@ -2,7 +2,7 @@
     "name": "comics/scraper",
     "type": "project",
     "license": "MIT",
-    "description": "ComicsScraper",
+    "description": "cbzforge",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
