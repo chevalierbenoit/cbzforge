@@ -8,7 +8,7 @@ use Symfony\Contracts\HttpClient\Exception\HttpExceptionInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class BdgestScraper implements ScraperInterface
+class BedethequeScraper implements ScraperInterface
 {
     private const BASE_URL = 'https://www.bedetheque.com';
 
@@ -19,12 +19,12 @@ class BdgestScraper implements ScraperInterface
 
     public function getName(): string
     {
-        return 'BDGest';
+        return 'Bedetheque';
     }
 
     public function supports(string $identifier): bool
     {
-        return str_contains($identifier, 'bdgest.com') || str_contains($identifier, 'bedetheque.com');
+        return str_contains($identifier, 'bedetheque.com');
     }
 
     public function getConfigFields(): array

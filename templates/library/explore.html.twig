@@ -41,10 +41,10 @@
                     data-action="scrape#searchFiles"
                     title="{{ 'explore.search_hint'|trans }}"
                     disabled>{{ ui.icon('search') }}{{ 'explore.search'|trans }}</button>
-            {% if 'BDGest' in scrapers %}
+            {% if 'Bedetheque' in scrapers %}
             <button id="url-scrape-btn" class="btn btn-sm metadata-action-btn"
                     data-action="scrape#urlScrape"
-                    disabled style="display: none;">BDGest</button>
+                    disabled style="display: none;">Bedetheque</button>
             {% endif %}
             <button id="rename-btn" class="btn btn-sm metadata-action-btn"
                     data-action="rename#smartPreview"

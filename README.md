@@ -8,7 +8,7 @@ A Symfony web app to tidy up a comic library:
 
 ## Features
 
-- **Metadata scraping**: search and scrape album metadata from BDGest and Google Books. More sources can be added through `ScraperInterface`.
+- **Metadata scraping**: search and scrape album metadata from Bedetheque and Google Books. More sources can be added through `ScraperInterface`.
 - **ComicInfo.xml injection**: write ComicRack-compatible metadata directly into CBZ archives.
 - **Format conversion**: convert CBR, PDF and EPUB to CBZ, one file or in batch. Jobs run in the background.
 - **Renaming and organization**: rename files with a template and move them into series folders.
