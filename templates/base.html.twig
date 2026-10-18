@@ -8,6 +8,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}cbzforge{% endblock %}</title>
     <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    {# Apply the saved theme before the first paint, so a dark page never flashes light. #}
+    <script>
+        (function () {
+            try {
+                var theme = localStorage.getItem('cbzforge-theme');
+                if (theme === 'light' || theme === 'dark') {
+                    document.documentElement.setAttribute('data-theme', theme);
+                }
+            } catch (e) {}
+        })();
+    </script>
     {% block stylesheets %}{% endblock %}
     {{ importmap('app') }}
 </head>
@@ -21,15 +32,21 @@
         <nav class="app-nav" aria-label="{{ 'nav.main'|trans }}">
             <a href="{{ path('dashboard') }}" class="nav-link{{ app.current_route == 'dashboard' or library_section ? ' is-active' : '' }}"
                {{ app.current_route == 'dashboard' or library_section ? 'aria-current="page"' : '' }}>
-                {{ ui.icon('library') }}<span>{{ 'sidebar.libraries'|trans }}</span>
+                <span>{{ 'sidebar.libraries'|trans }}</span>
             </a>
             <a href="{{ path('admin_libraries') }}" class="nav-link{{ admin_section ? ' is-active' : '' }}"
                {{ admin_section ? 'aria-current="page"' : '' }}>
-                {{ ui.icon('settings') }}<span>{{ 'nav.administration'|trans }}</span>
+                <span>{{ 'nav.administration'|trans }}</span>
             </a>
         </nav>
 
         <div class="header-spacer"></div>
+
+        <button type="button" class="icon-button theme-toggle" data-controller="theme" data-action="theme#toggle"
+                aria-label="{{ 'theme.toggle'|trans }}" title="{{ 'theme.toggle'|trans }}">
+            <span class="theme-icon theme-icon-moon">{{ ui.icon('moon') }}</span>
+            <span class="theme-icon theme-icon-sun">{{ ui.icon('sun') }}</span>
+        </button>
 
         <div class="queue" data-controller="status-bar"
              data-status-bar-locale-value="{{ app.request.locale }}"

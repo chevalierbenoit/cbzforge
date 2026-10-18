@@ -62,6 +62,49 @@ class LibraryController extends AbstractController
             'currentPath' => $subPath,
             'parentPath' => $parentPath,
             'scrapers' => $scraperNames,
+            'folderTree' => $this->folderTree($library, $subPath),
         ]);
+    }
+
+    /**
+     * Folder tree as an explorer shows it: the folders of the current path are
+     * expanded level by level, the siblings of each level stay visible, and
+     * folders off the path are not read.
+     *
+     * @return list<array{name: string, path: string, active: bool, expanded: bool, children: list<mixed>}>
+     */
+    private function folderTree(Library $library, string $currentPath): array
+    {
+        $activeSegments = '' === $currentPath ? [] : explode('/', $currentPath);
+
+        return $this->treeLevel($library, '', $activeSegments, 0, $currentPath);
+    }
+
+    /**
+     * @param list<string> $activeSegments
+     *
+     * @return list<array{name: string, path: string, active: bool, expanded: bool, children: list<mixed>}>
+     */
+    private function treeLevel(Library $library, string $parentPath, array $activeSegments, int $depth, string $currentPath): array
+    {
+        $nodes = [];
+        foreach ($this->libraryService->getEntries($library, $parentPath) as $entry) {
+            if ('dir' !== $entry['type']) {
+                continue;
+            }
+
+            $expanded = $depth < \count($activeSegments) && $activeSegments[$depth] === $entry['name'];
+            $nodes[] = [
+                'name' => $entry['name'],
+                'path' => $entry['path'],
+                'active' => $entry['path'] === $currentPath,
+                'expanded' => $expanded,
+                'children' => $expanded
+                    ? $this->treeLevel($library, $entry['path'], $activeSegments, $depth + 1, $currentPath)
+                    : [],
+            ];
+        }
+
+        return $nodes;
     }
 }

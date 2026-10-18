@@ -57,16 +57,18 @@
     </header>
 
     <div class="library-layout">
+        {% import 'library/_tree.html.twig' as tree %}
         <aside class="explorer-tree" aria-label="{{ 'explore.folders'|trans }}">
             <div class="explorer-tree-title">{{ 'explore.folders'|trans }}</div>
-            {% if parentPath is not null %}
-                <a href="{{ path('library_explore', {id: library.id, path: parentPath}) }}" class="tree-link is-back">{{ ui.icon('back') }}{{ 'explore.back'|trans }}</a>
-            {% endif %}
-            {% for entry in dirs %}
-                <a href="{{ path('library_explore', {id: library.id, path: entry.path}) }}" class="tree-link is-child">{{ ui.icon('folder') }}{{ entry.name }}</a>
-            {% else %}
-                <p class="form-help" style="padding: 0.5rem 1rem;">{{ 'explore.no_folders'|trans }}</p>
-            {% endfor %}
+            <ul class="tree">
+                <li>
+                    <a href="{{ path('library_explore', {id: library.id}) }}"
+                       class="tree-link{{ currentPath == '' ? ' is-active' : '' }}"{{ currentPath == '' ? ' aria-current="page"' : '' }}>
+                        {{ ui.icon('library') }}<span>{{ library.name }}</span>
+                    </a>
+                    {{ tree.nodes(folderTree, library) }}
+                </li>
+            </ul>
         </aside>
 
         <div class="browser-column" data-controller="inline-rename" data-inline-rename-library-id-value="{{ library.id }}">

@@ -154,3 +154,4 @@ explore.no_folders: No sub-folder here.
 explore.no_metadata: No metadata
 explore.rename_hint: Rename the selected files with the naming expression
 explore.search_hint: Search metadata for the selected files
+theme.toggle: Switch light / dark theme

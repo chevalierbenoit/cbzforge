@@ -154,3 +154,4 @@ explore.no_folders: Aucun sous-dossier ici.
 explore.no_metadata: Sans métadonnées
 explore.rename_hint: Renommer les fichiers sélectionnés avec l'expression de renommage
 explore.search_hint: Rechercher les métadonnées des fichiers sélectionnés
+theme.toggle: Changer de thème clair / sombre
