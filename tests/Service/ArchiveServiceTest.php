@@ -147,4 +147,11 @@ class ArchiveServiceTest extends TestCase
         }
         $this->tempFiles = [];
     }
+
+    public function testSelectCoverEntryPrefersConventionalNames(): void
+    {
+        $this->assertSame('cover.png', ArchiveService::selectCoverEntry(['b.jpg', 'a.jpg', 'cover.png']));
+        $this->assertSame('a.jpg', ArchiveService::selectCoverEntry(['b.jpg', 'a.jpg', 'notes.txt']));
+        $this->assertNull(ArchiveService::selectCoverEntry(['ComicInfo.xml']));
+    }
 }

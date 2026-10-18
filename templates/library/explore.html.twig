@@ -83,12 +83,12 @@
                 </a>
                 {% endfor %}
                 {% for entry in files %}
-                <div class="file-card{{ entry.extension != 'cbz' and entry.extension != '' ? ' file-card-unreadable' : '' }}"
+                <div class="file-card{{ entry.extension not in ['cbz', 'cbr', 'pdf'] ? ' file-card-unreadable' : '' }}"
                      data-path="{{ entry.path|e('html_attr') }}"
                      data-action="click->scrape#showMetadata"
                      data-scrape-path-param="{{ entry.path|e('html_attr') }}">
                     <div class="file-card-cover">
-                        {% if entry.extension == 'cbz' %}
+                        {% if entry.extension in ['cbz', 'cbr', 'pdf'] %}
                             <img src="{{ path('file_cover', {path: entry.path, library_id: library.id}) }}" alt=""
                                  loading="lazy"
                                  onerror="this.style.display='none';this.parentElement.querySelector('.file-icon').style.display='flex'">

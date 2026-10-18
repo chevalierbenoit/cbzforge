@@ -165,25 +165,6 @@ class ConversionServiceTest extends TestCase
         }
     }
 
-    public function testConvertCbrFallsBackToUnrarOnGarbage(): void
-    {
-        if (\extension_loaded('rar')) {
-            $this->markTestSkipped('RAR extension loaded, tests fallback path only');
-        }
-
-        $cbrPath = $this->tmpDir.'/test.cbr';
-        file_put_contents($cbrPath, 'not a valid rar archive');
-
-        $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('CBR extraction failed');
-
-        try {
-            $this->service->convert($cbrPath);
-        } finally {
-            $this->cleanupConvertTempDirs();
-        }
-    }
-
     public function testConvertCbrThatIsActuallyZipConvertsToCbz(): void
     {
         $cbrPath = $this->tmpDir.'/mislabeled.cbr';
@@ -211,40 +192,8 @@ class ConversionServiceTest extends TestCase
         unlink($result);
     }
 
-    public function testConvertCbrUsesRarExtensionWhenAvailable(): void
-    {
-        if (!\extension_loaded('rar')) {
-            $this->markTestSkipped('RAR extension not available');
-        }
-
-        $cbrPath = __DIR__.'/test.cbr';
-        if (!file_exists($cbrPath)) {
-            $this->markTestSkipped('Test RAR file not found');
-        }
-
-        $result = $this->service->convert($cbrPath);
-
-        $this->assertStringEndsWith('.cbz', $result);
-        $this->assertFileExists($result);
-
-        $zip = new \ZipArchive();
-        $this->assertTrue($zip->open($result));
-        $names = [];
-        for ($i = 0; $i < $zip->count(); ++$i) {
-            $names[] = $zip->statIndex($i)['name'];
-        }
-        $this->assertContains('page_001.jpg', $names);
-        $zip->close();
-
-        unlink($result);
-    }
-
     public function testExtractRarReflectionFallback(): void
     {
-        if (\extension_loaded('rar')) {
-            $this->markTestSkipped('RAR extension loaded, tests fallback path only');
-        }
-
         $method = new \ReflectionMethod(ConversionService::class, 'extractRar');
 
         $destDir = $this->tmpDir.'/extract_dest';

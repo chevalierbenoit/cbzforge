@@ -20,8 +20,8 @@ Docker is the recommended setup. Without Docker you need:
 
 - PHP 8.4 or newer, with the `ctype`, `iconv`, `pdo_sqlite`, `zip` and `gd` extensions
 - Composer
-- For CBR conversion: the `unrar` command line tool, or the PHP `rar` extension
-- For PDF conversion: `pdftoppm` (from poppler-utils)
+- For CBR (RAR) files: the `unrar` command line tool (the Docker image builds it from RARLAB's source)
+- For PDF files: `pdftoppm` (from poppler-utils); the Docker image includes it
 
 ## Quick start
 

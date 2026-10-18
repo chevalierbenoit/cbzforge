@@ -65,24 +65,6 @@ class ConversionService
             return;
         }
 
-        if (\extension_loaded('rar')) {
-            $archive = \RarArchive::open($path);
-            if (!$archive) {
-                throw new \RuntimeException("Failed to open RAR archive: {$path}");
-            }
-            $entries = $archive->getEntries();
-            if ($entries) {
-                foreach ($entries as $entry) {
-                    if (!$entry->isDirectory()) {
-                        $entry->extract($dest);
-                    }
-                }
-            }
-            $archive->close();
-
-            return;
-        }
-
         $escapedPath = escapeshellarg($path);
         $escapedDest = escapeshellarg($dest);
         exec("unrar x -o+ {$escapedPath} {$escapedDest} 2>&1", $output, $exitCode);
