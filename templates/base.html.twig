@@ -7,7 +7,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}cbzforge{% endblock %}</title>
-    <link rel="icon" href="{{ asset('favicon.svg') }}" type="image/svg+xml">
+    <link rel="icon" href="{{ asset('favicon.svg') }}?v=2" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}?v=2">
     {# Apply the saved theme before the first paint, so a dark page never flashes light. #}
     <script>
         (function () {
@@ -25,7 +26,7 @@
 <body>
     <header class="app-header">
         <a href="{{ path('dashboard') }}" class="brand">
-            <span class="brand-mark" aria-hidden="true">CF</span>
+            <img src="{{ asset('favicon.svg') }}?v=2" alt="" class="brand-mark" width="28" height="28">
             <span class="brand-text">cbzforge</span>
         </a>
 

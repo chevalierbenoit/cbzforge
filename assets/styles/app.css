@@ -176,14 +176,7 @@ code, .mono {
 
 .brand-mark {
     width: 28px; height: 28px;
-    border-radius: 8px;
-    background: var(--accent);
-    color: var(--on-accent);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8125rem;
-    font-weight: 800;
+    flex-shrink: 0;
 }
 
 .app-nav {
