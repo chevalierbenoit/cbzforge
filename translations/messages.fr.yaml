@@ -10,10 +10,6 @@ sidebar.administration: Administration
 # Dashboard
 dashboard.my_libraries: Mes bibliothèques
 dashboard.manage: Gérer
-dashboard.no_libraries: Aucune bibliothèque configurée.
-dashboard.configure_library: Configurer une bibliothèque
-dashboard.libraries: Bibliothèques
-dashboard.browse: Parcourir
 
 # Explore
 explore.root: Racine
@@ -142,7 +138,6 @@ admin.settings.not_configured_help: Renseignez les champs obligatoires puis enre
 admin.tasks.lead: Traitements en arrière-plan (scrape, conversion, renommage). Relancez les échecs ou videz les terminés.
 admin.tasks.delete: Supprimer la tâche
 admin.tasks.retry: Relancer la tâche
-dashboard.empty_hint: Ajoutez le dossier qui contient vos BD (CBZ, CBR ou PDF). cbzforge le lit sur place.
 explore.actions: Actions sur les fichiers sélectionnés
 explore.folders: Dossiers
 explore.has_metadata: Métadonnées
@@ -155,3 +150,15 @@ explore.no_metadata: Sans métadonnées
 explore.rename_hint: Renommer les fichiers sélectionnés avec l'expression de renommage
 explore.search_hint: Rechercher les métadonnées des fichiers sélectionnés
 theme.toggle: Changer de thème clair / sombre
+
+# Dashboard welcome screen
+dashboard.welcome_title: Bienvenue dans cbzforge
+dashboard.welcome_lead: cbzforge lit vos dossiers de BD, récupère leurs métadonnées et renomme les fichiers de façon cohérente. Commençons par votre première bibliothèque.
+dashboard.add_first: Ajouter ma première bibliothèque
+dashboard.step1_title: Ajouter un dossier
+dashboard.step1_text: Indiquez le chemin d'un dossier qui contient vos BD (CBZ, CBR ou PDF). Les fichiers sont lus sur place.
+dashboard.step2_title: Trouver les métadonnées
+dashboard.step2_text: Sélectionnez une BD et recherchez ses métadonnées. Seules les sources activées et configurées sont proposées.
+dashboard.step2_link: Vérifier les sources de métadonnées
+dashboard.step3_title: Renommer de façon cohérente
+dashboard.step3_text: Choisissez une expression de nommage. Les fichiers sont renommés depuis la racine de la bibliothèque, dans un dossier par série.

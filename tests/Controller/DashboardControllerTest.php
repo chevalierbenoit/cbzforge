@@ -7,16 +7,21 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DashboardControllerTest extends WebTestCase
 {
-    public function testIndexRendersDashboard(): void
+    public function testEmptyDashboardShowsWelcome(): void
     {
         $client = static::createClient();
         $crawler = $client->request('GET', '/');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h1', 'My libraries');
+        $this->assertSelectorTextContains('h1', 'Welcome to cbzforge');
+        $this->assertSame(3, $crawler->filter('.welcome-step')->count());
+        $this->assertSame(
+            '/admin/libraries',
+            $crawler->selectLink('Add my first library')->attr('href'),
+        );
     }
 
-    public function testIndexShowsLibraries(): void
+    public function testIndexShowsLibrariesAsCards(): void
     {
         $client = static::createClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
@@ -30,5 +35,11 @@ class DashboardControllerTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('body', 'Test Lib');
+        $this->assertSame(0, $crawler->filter('.welcome')->count());
+        // The whole card is the link: no separate browse button.
+        $card = $crawler->filter('a.library-card');
+        $this->assertSame(1, $card->count());
+        $this->assertSame('/library/'.$library->getId(), $card->attr('href'));
+        $this->assertStringNotContainsString('Browse', $crawler->filter('main')->text());
     }
 }
