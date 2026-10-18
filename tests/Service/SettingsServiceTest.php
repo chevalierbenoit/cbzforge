@@ -69,4 +69,20 @@ class SettingsServiceTest extends TestCase
         $service = new SettingsService($em);
         $this->assertFalse($service->has('missing'));
     }
+
+    public function testHasReturnsFalseForEmptyValue(): void
+    {
+        $setting = new Setting();
+        $setting->setKey('empty');
+        $setting->setValue('');
+
+        $repo = $this->createMock(EntityRepository::class);
+        $repo->expects(self::once())->method('find')->with('empty')->willReturn($setting);
+
+        $em = $this->createMock(EntityManagerInterface::class);
+        $em->expects(self::once())->method('getRepository')->with(Setting::class)->willReturn($repo);
+
+        $service = new SettingsService($em);
+        $this->assertFalse($service->has('empty'));
+    }
 }

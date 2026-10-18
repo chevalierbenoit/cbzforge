@@ -31,12 +31,36 @@ class ScraperChain
         return null;
     }
 
-    /** @return ScraperInterface[] */
-    public function getActiveScrapers(SettingsService $settings): array
+    /** Whether the admin has switched the scraper on. */
+    public function isEnabled(ScraperInterface $scraper, SettingsService $settings): bool
     {
-        return array_filter(
+        return '0' !== $settings->get('scraper.'.$scraper->getName().'.enabled');
+    }
+
+    /** Whether every required setting of the scraper has a value. */
+    public function isConfigured(ScraperInterface $scraper, SettingsService $settings): bool
+    {
+        foreach ($scraper->getConfigFields() as $field) {
+            if (($field['required'] ?? false) && !$settings->has($field['key'])) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /** A scraper is available when it is enabled and configured. */
+    public function isAvailable(ScraperInterface $scraper, SettingsService $settings): bool
+    {
+        return $this->isEnabled($scraper, $settings) && $this->isConfigured($scraper, $settings);
+    }
+
+    /** @return ScraperInterface[] */
+    public function getAvailableScrapers(SettingsService $settings): array
+    {
+        return array_values(array_filter(
             $this->getScrapers(),
-            static fn (ScraperInterface $scraper) => '0' !== $settings->get('scraper.'.$scraper->getName().'.enabled'),
-        );
+            fn (ScraperInterface $scraper) => $this->isAvailable($scraper, $settings),
+        ));
     }
 }

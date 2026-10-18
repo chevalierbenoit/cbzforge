@@ -35,7 +35,7 @@ class ScrapeUrlController extends AbstractController
             if (!$scraper) {
                 return $this->json(['error' => $this->translator->trans('error.no_scraper_for_url')], 400);
             }
-            if ('0' === $this->settings->get('scraper.'.$scraper->getName().'.enabled')) {
+            if (!$this->scraperChain->isAvailable($scraper, $this->settings)) {
                 return $this->json(['error' => $this->translator->trans('error.scraper_disabled')], 400);
             }
             $info = $scraper->scrape($url);

@@ -11,7 +11,12 @@ interface ScraperInterface
 
     public function supports(string $identifier): bool;
 
-    /** @return array<int, array{key: string, label: string, type: 'text'|'password'}> */
+    /**
+     * Settings the admin fills in for this scraper. A field with `required => true`
+     * must be set before the scraper is available; `required` defaults to false.
+     *
+     * @return array<int, array{key: string, label: string, type: 'text'|'password', required?: bool}>
+     */
     public function getConfigFields(): array;
 
     /** @return ScrapeResult[] */

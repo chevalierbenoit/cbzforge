@@ -19,13 +19,16 @@
             <div class="settings-card-header">
                 <input type="hidden" name="scraper_enabled_{{ scraper_slug }}" value="0">
                 <input type="checkbox" name="scraper_enabled_{{ scraper_slug }}" id="toggle-{{ scraper_slug }}" value="1"
-                       {% if scraper.enabled %}checked{% endif %}
+                       {% if scraper.enabled and scraper.configured %}checked{% endif %}
+                       {% if not scraper.configured %}disabled{% endif %}
                        style="width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer;">
                 <span class="settings-card-title">{{ scraper.name }}</span>
-                {% if scraper.enabled %}
-                    <span class="badge badge-success">{{ 'admin.settings.active'|trans }}</span>
-                {% else %}
+                {% if not scraper.enabled %}
                     <span class="badge badge-neutral">{{ 'admin.settings.inactive'|trans }}</span>
+                {% elseif not scraper.configured %}
+                    <span class="badge badge-warning">{{ 'admin.settings.not_configured'|trans }}</span>
+                {% else %}
+                    <span class="badge badge-success">{{ 'admin.settings.available'|trans }}</span>
                 {% endif %}
             </div>
             {% if scraper.fields is empty %}

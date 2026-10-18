@@ -53,7 +53,7 @@ class LibraryController extends AbstractController
 
         $scraperNames = array_values(array_map(
             static fn ($s) => $s->getName(),
-            $this->scraperChain->getActiveScrapers($this->settings),
+            $this->scraperChain->getAvailableScrapers($this->settings),
         ));
 
         return $this->render('library/explore.html.twig', [
