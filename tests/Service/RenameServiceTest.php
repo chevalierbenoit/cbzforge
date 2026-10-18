@@ -197,6 +197,24 @@ class RenameServiceTest extends TestCase
         $this->assertSame('/mnt/Livres/Astérix/41 - Astérix en Lusitanie.cbz', $preview->newPath);
     }
 
+    public function testRenameInsideSeriesFolderDoesNotNestASecondSeriesFolder(): void
+    {
+        $root = sys_get_temp_dir().'/rename-nest-'.uniqid();
+        mkdir($root.'/Astérix', 0777, true);
+        $current = $root.'/Astérix/#39 - Astérix et le Griffon (2021).cbz';
+        touch($current);
+        $info = new ComicInfo(series: 'Astérix', title: 'Astérix et le Griffon', number: 39, year: 2021);
+
+        $newPath = $this->service->rename($current, $info, null, $root);
+
+        $this->assertSame($root.'/Astérix/Astérix #39 (2021).cbz', $newPath);
+        $this->assertDirectoryDoesNotExist($root.'/Astérix/Astérix');
+
+        unlink($newPath);
+        rmdir($root.'/Astérix');
+        rmdir($root);
+    }
+
     public function testRenameWithExpression(): void
     {
         $tmpDir = sys_get_temp_dir().'/rename_expr_'.uniqid();
