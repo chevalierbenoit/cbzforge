@@ -997,6 +997,12 @@ tr.selected td { background: var(--accent-soft); }
 
 .metadata-horizontal { display: grid; gap: 1.25rem; }
 
+/* Wide panel: cover beside the form, fields in two columns, sections fold */
+@media (min-width: 1000px) {
+    .metadata-horizontal { grid-template-columns: 120px minmax(0, 1fr); gap: 1rem; align-items: start; }
+    .metadata-horizontal-cover { max-width: 120px; }
+}
+
 .metadata-horizontal-cover {
     width: 100%;
     max-width: 200px;
@@ -1012,12 +1018,34 @@ tr.selected td { background: var(--accent-soft); }
 .metadata-horizontal-form h3 { margin-bottom: 0.25rem; }
 
 .metadata-section {
-    display: grid;
-    gap: 0.75rem;
-    padding-top: 1rem;
-    margin-top: 1rem;
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
     border-top: 1px solid var(--border);
 }
+
+.metadata-section > .metadata-horizontal-grid,
+.metadata-section > .form-group { margin-top: 0.75rem; }
+
+details.metadata-section > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
+    cursor: pointer;
+    user-select: none;
+}
+
+details.metadata-section > summary::-webkit-details-marker { display: none; }
+details.metadata-section > summary::after {
+    content: '';
+    width: 0.45rem;
+    height: 0.45rem;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.15s;
+}
+details.metadata-section[open] > summary::after { transform: rotate(-135deg); }
 
 .metadata-section-title {
     font-size: 0.8125rem;
@@ -1029,7 +1057,7 @@ tr.selected td { background: var(--accent-soft); }
 
 .metadata-horizontal-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
     gap: 0.75rem 1rem;
 }
 
@@ -1182,7 +1210,7 @@ tr.selected td { background: var(--accent-soft); }
         grid-template-columns: 240px minmax(0, 1fr);
     }
     .library-layout:has(.metadata-panel.is-open) {
-        grid-template-columns: 240px minmax(0, 1fr) 380px;
+        grid-template-columns: 240px minmax(0, 1fr) 520px;
     }
     .explorer-tree {
         border-right: 1px solid var(--border);

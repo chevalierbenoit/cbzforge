@@ -15,6 +15,8 @@ class FilenameParser
             '/^(.+?)\s*-\s*(?:T)?(\d+)\s*-\s*(.+)$/i',
             // 2. "Series T(\d+) Title" (space-separated with T prefix)
             '/^(.+?)\s+T(\d+)\s+(.+)$/i',
+            // 2b. "Series -01" or "Series -01 - Title" (number glued to the dash)
+            '/^(.+?)\s*-\s*(?:T|Tome\s*)?(\d+)(?:\s*-\s*(.+))?$/i',
             // 3. "Series #(\d+)" with optional " - Title"
             '/^(.+?)\s+#(\d+)(?:\s*-\s*(.+))?$/i',
             // 4. "Series v(\d+)"
@@ -45,6 +47,8 @@ class FilenameParser
     private function normalize(string $filename): string
     {
         $name = preg_replace('/\.[^.]+$/', '', $filename);
+        // Release and scan annotations: "(Best of Fusion Comics 03.2019)", "[HQ]", "@9-art-BD".
+        $name = (string) preg_replace(['/\([^)]*\)/', '/\[[^\]]*\]/', '/@\S+/'], ' ', $name);
         $name = str_replace('_', ' ', $name);
         $name = (string) preg_replace('/\s+/', ' ', $name);
 

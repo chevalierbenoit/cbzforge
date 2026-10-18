@@ -1167,8 +1167,8 @@ _renderBatchForm(common, coverUrl, count, paths) {
                     </div>
                     <div class="metadata-horizontal-form">
                         <form id="metadata-form">
-                            <div class="metadata-section">
-                                <div class="metadata-section-title">${this.translator.trans('js.scrape.section_series')}</div>
+                            <details class="metadata-section" open>
+                                <summary class="metadata-section-title">${this.translator.trans('js.scrape.section_series')}</summary>
                                 <div class="metadata-horizontal-grid">
                                     ${formField('series', this.translator.trans('js.scrape.series'), comicInfo.series)}
                                     ${formField('title', this.translator.trans('js.scrape.title'), comicInfo.title)}
@@ -1176,9 +1176,9 @@ _renderBatchForm(common, coverUrl, count, paths) {
                                     ${formField('year', this.translator.trans('js.scrape.year'), comicInfo.year)}
                                     ${formField('language_iso', this.translator.trans('js.scrape.language'), comicInfo.language_iso)}
                                 </div>
-                            </div>
-                            <div class="metadata-section">
-                                <div class="metadata-section-title">${this.translator.trans('js.scrape.section_credits')}</div>
+                            </details>
+                            <details class="metadata-section" open>
+                                <summary class="metadata-section-title">${this.translator.trans('js.scrape.section_credits')}</summary>
                                 <div class="metadata-horizontal-grid">
                                     ${formField('writer', this.translator.trans('js.scrape.writer'), comicInfo.writer)}
                                     ${formField('penciler', this.translator.trans('js.scrape.penciler'), comicInfo.penciler)}
@@ -1187,9 +1187,9 @@ _renderBatchForm(common, coverUrl, count, paths) {
                                     ${formField('letterer', this.translator.trans('js.scrape.letterer'), comicInfo.letterer)}
                                     ${formField('cover_artist', this.translator.trans('js.scrape.cover_artist'), comicInfo.cover_artist)}
                                 </div>
-                            </div>
-                            <div class="metadata-section">
-                                <div class="metadata-section-title">${this.translator.trans('js.scrape.section_edition')}</div>
+                            </details>
+                            <details class="metadata-section">
+                                <summary class="metadata-section-title">${this.translator.trans('js.scrape.section_edition')}</summary>
                                 <div class="metadata-horizontal-grid">
                                     ${formField('publisher', this.translator.trans('js.scrape.publisher'), comicInfo.publisher)}
                                     ${formField('isbn', this.translator.trans('js.scrape.isbn'), comicInfo.isbn)}
@@ -1201,7 +1201,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
                                     <label for="meta-summary">${this.translator.trans('js.scrape.summary')}</label>
                                     <textarea id="meta-summary" name="summary" rows="4">${escapeHtml(comicInfo.summary || '')}</textarea>
                                 </div>
-                            </div>
+                            </details>
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-primary btn-sm">${this.translator.trans('js.scrape.save')}</button>
                                 <button type="button" class="btn btn-danger btn-sm" data-action="${this.identifier}#deleteMetadata">${this.translator.trans('js.scrape.delete')}</button>
