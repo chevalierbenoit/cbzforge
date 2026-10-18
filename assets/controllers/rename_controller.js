@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 import { Translator } from '../translator.js';
+import { setMetadataBadge } from '../badges.js';
 
 function escapeHtml(str) {
     const div = document.createElement('div');
@@ -368,11 +369,9 @@ export default class extends Controller {
         const badge = card.querySelector('.file-card-body .badge');
         if (badge) {
             if (task.status === 'failed') {
-                badge.className = 'badge badge-danger';
-                badge.textContent = '✗';
+                setMetadataBadge(badge, 'failed', this.translator);
             } else {
-                badge.className = 'badge badge-success';
-                badge.textContent = '✓';
+                setMetadataBadge(badge, 'ok', this.translator);
             }
         }
     }
@@ -432,14 +431,12 @@ export default class extends Controller {
 
         const badge = card.querySelector('.file-card-body .badge');
         if (badge) {
-            badge.className = 'badge badge-success';
-            badge.textContent = '✓';
+            setMetadataBadge(badge, 'ok', this.translator);
         } else {
             const body = card.querySelector('.file-card-body');
             if (body) {
                 const newBadge = document.createElement('span');
-                newBadge.className = 'badge badge-success';
-                newBadge.textContent = '✓';
+                setMetadataBadge(newBadge, 'ok', this.translator);
                 body.appendChild(newBadge);
             }
         }

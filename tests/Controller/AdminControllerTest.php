@@ -213,14 +213,14 @@ class AdminControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
     }
 
-    public function testAdminSidebarIsIdenticalOnEveryAdminPage(): void
+    public function testAdminNavigationIsIdenticalOnEveryAdminPage(): void
     {
         $expected = [
-            '📚 Libraries',
-            '⚙ Scrapers',
-            '✏ Renaming',
-            '🔄 Conversion',
-            '📋 Task queue',
+            'Libraries',
+            'Scrapers',
+            'Renaming',
+            'Conversion',
+            'Task queue',
         ];
 
         $paths = [
@@ -238,11 +238,11 @@ class AdminControllerTest extends WebTestCase
 
             $this->assertResponseIsSuccessful();
 
-            $items = $crawler->filter('.sidebar .sidebar-item')->each(
+            $items = $crawler->filter('.subnav .subnav-link')->each(
                 static fn ($node) => trim(preg_replace('/\s+/', ' ', $node->text())),
             );
 
-            $this->assertSame($expected, $items, \sprintf('Admin sidebar differs on %s', $path));
+            $this->assertSame($expected, $items, \sprintf('Admin navigation differs on %s', $path));
         }
     }
 

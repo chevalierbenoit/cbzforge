@@ -1,5 +1,13 @@
 import { Controller } from '@hotwired/stimulus';
 import { Translator } from '../translator.js';
+import { setMetadataBadge, metadataBadge } from '../badges.js';
+
+function formField(name, label, value) {
+    return `<div class="form-group">
+        <label for="meta-${name}">${label}</label>
+        <input type="text" id="meta-${name}" name="${name}" value="${escapeHtml(value == null ? '' : String(value))}">
+    </div>`;
+}
 
 function escapeHtml(str) {
     const div = document.createElement('div');
@@ -121,7 +129,6 @@ export default class extends Controller {
         if (counter) {
             counter.textContent = count > 0 ? `${count} ${count > 1 ? this.translator.trans('js.scrape.files_selected') : this.translator.trans('js.scrape.file_selected')}` : '';
         }
-        this._setStatusBar(count > 0 ? `${count} ${count > 1 ? this.translator.trans('js.scrape.files_selected') : this.translator.trans('js.scrape.file_selected')}` : '');
         const btns = document.querySelectorAll('.metadata-action-btn');
         btns.forEach(b => b.disabled = count === 0);
         const renameBtn = document.getElementById('rename-btn');
@@ -518,14 +525,13 @@ export default class extends Controller {
             const rows = document.querySelectorAll(`tr[data-scrape-path-param="${this._currentPath}"]`);
             rows.forEach(row => {
                 const cell = row.querySelector('td:nth-child(3)');
-                if (cell) cell.innerHTML = '<span style="color: #2e7d32;">✓</span>';
+                if (cell) cell.innerHTML = metadataBadge('ok', this.translator);
             });
             const cards = document.querySelectorAll(`.file-card[data-scrape-path-param="${this._currentPath}"]`);
             cards.forEach(card => {
                 const badge = card.querySelector('.badge');
                 if (badge) {
-                    badge.className = 'badge badge-success';
-                    badge.textContent = '✓';
+                    setMetadataBadge(badge, 'ok', this.translator);
                 }
             });
         }
@@ -539,7 +545,7 @@ export default class extends Controller {
 
         const metadataDisplay = document.getElementById('metadata-display');
         if (metadataDisplay) {
-            metadataDisplay.style.display = 'flex';
+            metadataDisplay.classList.add('is-open');
         }
 
         try {
@@ -773,8 +779,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
                     cards.forEach(card => {
                         const badge = card.querySelector('.badge');
                         if (badge) {
-                            badge.className = 'badge badge-success';
-                            badge.textContent = '✓';
+                            setMetadataBadge(badge, 'ok', this.translator);
                         }
                     });
                 }
@@ -811,7 +816,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
         }
         const metadataDisplay = document.getElementById('metadata-display');
         if (metadataDisplay) {
-            metadataDisplay.style.display = 'none';
+            metadataDisplay.classList.remove('is-open');
         }
     }
 
@@ -933,8 +938,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
                     cards.forEach(card => {
                         const badge = card.querySelector('.badge');
                         if (badge) {
-                            badge.className = 'badge badge-success';
-                            badge.textContent = '✓';
+                            setMetadataBadge(badge, 'ok', this.translator);
                         }
                     });
                 }
@@ -1043,11 +1047,9 @@ _renderBatchForm(common, coverUrl, count, paths) {
         const badge = card.querySelector('.file-card-body .badge');
         if (badge) {
             if (task.status === 'failed') {
-                badge.className = 'badge badge-danger';
-                badge.textContent = '✗';
+                setMetadataBadge(badge, 'failed', this.translator);
             } else {
-                badge.className = 'badge badge-success';
-                badge.textContent = '✓';
+                setMetadataBadge(badge, 'ok', this.translator);
             }
         }
     }
@@ -1119,7 +1121,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
         // Show metadata panel and enable action buttons
         const metadataDisplay = document.getElementById('metadata-display');
         if (metadataDisplay) {
-            metadataDisplay.style.display = 'flex';
+            metadataDisplay.classList.add('is-open');
             const btns = metadataDisplay.querySelectorAll('.metadata-action-btn');
             btns.forEach(b => b.disabled = false);
         }
@@ -1165,75 +1167,40 @@ _renderBatchForm(common, coverUrl, count, paths) {
                     </div>
                     <div class="metadata-horizontal-form">
                         <form id="metadata-form">
-                            <div class="metadata-horizontal-grid">
-                                <div class="form-group">
-                            <label>${this.translator.trans('js.scrape.series')}</label>
-                                    <input type="text" name="series" value="${escapeHtml(comicInfo.series || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.title')}</label>
-                                    <input type="text" name="title" value="${escapeHtml(comicInfo.title || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.number')}</label>
-                                    <input type="text" name="number" value="${escapeHtml(comicInfo.number || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.year')}</label>
-                                    <input type="text" name="year" value="${escapeHtml(comicInfo.year || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.writer')}</label>
-                                    <input type="text" name="writer" value="${escapeHtml(comicInfo.writer || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.penciler')}</label>
-                                    <input type="text" name="penciler" value="${escapeHtml(comicInfo.penciler || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.publisher')}</label>
-                                    <input type="text" name="publisher" value="${escapeHtml(comicInfo.publisher || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.genre')}</label>
-                                    <input type="text" name="genre" value="${escapeHtml(genreStr)}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.inker')}</label>
-                                    <input type="text" name="inker" value="${escapeHtml(comicInfo.inker || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.colorist')}</label>
-                                    <input type="text" name="colorist" value="${escapeHtml(comicInfo.colorist || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.letterer')}</label>
-                                    <input type="text" name="letterer" value="${escapeHtml(comicInfo.letterer || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.cover_artist')}</label>
-                                    <input type="text" name="cover_artist" value="${escapeHtml(comicInfo.cover_artist || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.isbn')}</label>
-                                    <input type="text" name="isbn" value="${escapeHtml(comicInfo.isbn || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.age_rating')}</label>
-                                    <input type="text" name="age_rating" value="${escapeHtml(comicInfo.age_rating || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.language')}</label>
-                                    <input type="text" name="language_iso" value="${escapeHtml(comicInfo.language_iso || '')}">
-                                </div>
-                                <div class="form-group">
-                                    <label>${this.translator.trans('js.scrape.characters')}</label>
-                                    <input type="text" name="characters" value="${escapeHtml(charsStr)}">
+                            <div class="metadata-section">
+                                <div class="metadata-section-title">${this.translator.trans('js.scrape.section_series')}</div>
+                                <div class="metadata-horizontal-grid">
+                                    ${formField('series', this.translator.trans('js.scrape.series'), comicInfo.series)}
+                                    ${formField('title', this.translator.trans('js.scrape.title'), comicInfo.title)}
+                                    ${formField('number', this.translator.trans('js.scrape.number'), comicInfo.number)}
+                                    ${formField('year', this.translator.trans('js.scrape.year'), comicInfo.year)}
+                                    ${formField('language_iso', this.translator.trans('js.scrape.language'), comicInfo.language_iso)}
                                 </div>
                             </div>
-                            <div class="form-group" style="margin-bottom: 0.5rem;">
-                                <label>${this.translator.trans('js.scrape.summary')}</label>
-                                <textarea name="summary" rows="2">${escapeHtml(comicInfo.summary || '')}</textarea>
+                            <div class="metadata-section">
+                                <div class="metadata-section-title">${this.translator.trans('js.scrape.section_credits')}</div>
+                                <div class="metadata-horizontal-grid">
+                                    ${formField('writer', this.translator.trans('js.scrape.writer'), comicInfo.writer)}
+                                    ${formField('penciler', this.translator.trans('js.scrape.penciler'), comicInfo.penciler)}
+                                    ${formField('inker', this.translator.trans('js.scrape.inker'), comicInfo.inker)}
+                                    ${formField('colorist', this.translator.trans('js.scrape.colorist'), comicInfo.colorist)}
+                                    ${formField('letterer', this.translator.trans('js.scrape.letterer'), comicInfo.letterer)}
+                                    ${formField('cover_artist', this.translator.trans('js.scrape.cover_artist'), comicInfo.cover_artist)}
+                                </div>
+                            </div>
+                            <div class="metadata-section">
+                                <div class="metadata-section-title">${this.translator.trans('js.scrape.section_edition')}</div>
+                                <div class="metadata-horizontal-grid">
+                                    ${formField('publisher', this.translator.trans('js.scrape.publisher'), comicInfo.publisher)}
+                                    ${formField('isbn', this.translator.trans('js.scrape.isbn'), comicInfo.isbn)}
+                                    ${formField('age_rating', this.translator.trans('js.scrape.age_rating'), comicInfo.age_rating)}
+                                    ${formField('genre', this.translator.trans('js.scrape.genre'), genreStr)}
+                                    ${formField('characters', this.translator.trans('js.scrape.characters'), charsStr)}
+                                </div>
+                                <div class="form-group">
+                                    <label for="meta-summary">${this.translator.trans('js.scrape.summary')}</label>
+                                    <textarea id="meta-summary" name="summary" rows="4">${escapeHtml(comicInfo.summary || '')}</textarea>
+                                </div>
                             </div>
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-primary btn-sm">${this.translator.trans('js.scrape.save')}</button>
@@ -1286,7 +1253,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
                             rows.forEach(row => {
                                 const metadataCell = row.querySelector('td:nth-child(3)');
                                 if (metadataCell) {
-                                    metadataCell.innerHTML = '<span style="color: #2e7d32;">✓</span>';
+                                    metadataCell.innerHTML = metadataBadge('ok', this.translator);
                                 }
                             });
                             // Update file-card badge for grid layout
@@ -1294,8 +1261,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
                             cards.forEach(card => {
                                 const badge = card.querySelector('.badge');
                                 if (badge) {
-                                    badge.className = 'badge badge-success';
-                                    badge.textContent = '✓';
+                                    setMetadataBadge(badge, 'ok', this.translator);
                                 }
                             });
 
@@ -1347,15 +1313,14 @@ _renderBatchForm(common, coverUrl, count, paths) {
                 rows.forEach(row => {
                     const metadataCell = row.querySelector('td:nth-child(3)');
                     if (metadataCell) {
-                        metadataCell.innerHTML = '<span style="color: #c62828;">✗</span>';
+                        metadataCell.innerHTML = metadataBadge('failed', this.translator);
                     }
                 });
                 const cards = document.querySelectorAll(`.file-card[data-scrape-path-param="${path}"]`);
                 cards.forEach(card => {
                     const badge = card.querySelector('.badge');
                     if (badge) {
-                        badge.className = 'badge badge-danger';
-                        badge.textContent = '✗';
+                        setMetadataBadge(badge, 'failed', this.translator);
                     }
                 });
 

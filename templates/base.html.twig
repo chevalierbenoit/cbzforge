@@ -1,3 +1,6 @@
+{% import 'components/_icons.html.twig' as ui %}
+{% set admin_section = app.current_route starts with 'admin_' %}
+{% set library_section = app.current_route starts with 'library_' %}
 <!DOCTYPE html>
 <html lang="{{ app.request.locale }}">
 <head>
@@ -9,35 +12,34 @@
     {{ importmap('app') }}
 </head>
 <body>
-    <div class="app-layout">
-        <div class="app-body">
-            <nav class="icon-bar">
-                <a href="{{ path('dashboard') }}" class="icon-bar-logo">CS</a>
-                <a href="{{ path('dashboard') }}" class="icon-bar-item{{ app.current_route == 'dashboard' ? ' active' : '' }}" title="{{ 'nav.dashboard'|trans }}">⌂</a>
-                <a href="{{ path('admin_libraries') }}" class="icon-bar-item{{ app.current_route starts with 'admin_libraries' or app.current_route starts with 'admin_settings' ? ' active' : '' }}" title="{{ 'nav.administration'|trans }}">⚙</a>
-                <div class="icon-bar-spacer"></div>
-            </nav>
+    <header class="app-header">
+        <a href="{{ path('dashboard') }}" class="brand">
+            <span class="brand-mark" aria-hidden="true">CF</span>
+            <span class="brand-text">cbzforge</span>
+        </a>
 
-            <aside class="sidebar">
-                {% block sidebar %}
-                <div class="sidebar-header">{{ 'sidebar.navigation'|trans }}</div>
-                {% endblock %}
-            </aside>
+        <nav class="app-nav" aria-label="{{ 'nav.main'|trans }}">
+            <a href="{{ path('dashboard') }}" class="nav-link{{ app.current_route == 'dashboard' or library_section ? ' is-active' : '' }}"
+               {{ app.current_route == 'dashboard' or library_section ? 'aria-current="page"' : '' }}>
+                {{ ui.icon('library') }}<span>{{ 'sidebar.libraries'|trans }}</span>
+            </a>
+            <a href="{{ path('admin_libraries') }}" class="nav-link{{ admin_section ? ' is-active' : '' }}"
+               {{ admin_section ? 'aria-current="page"' : '' }}>
+                {{ ui.icon('settings') }}<span>{{ 'nav.administration'|trans }}</span>
+            </a>
+        </nav>
 
-            <main class="main-content">
-                <turbo-frame id="flash">
-                    {% for type, messages in app.flashes %}
-                        {% for message in messages %}
-                            <div class="flash flash-{{ type }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endfor %}
-                </turbo-frame>
-                {% block body %}{% endblock %}
-            </main>
-        </div>
-        <div class="status-bar-wrapper" data-controller="status-bar"
+        <div class="header-spacer"></div>
+
+        <div class="queue" data-controller="status-bar"
              data-status-bar-locale-value="{{ app.request.locale }}"
              data-action="mouseenter->status-bar#showPanel mouseleave->status-bar#hidePanelWithDelay">
+            <button type="button" class="queue-button" data-action="click->status-bar#togglePanel"
+                    aria-haspopup="true" aria-label="{{ 'status_bar.queue'|trans }}">
+                {{ ui.icon('queue') }}
+                <span class="queue-label">{{ 'status_bar.queue'|trans }}</span>
+                <span class="status-bar-badge" data-status-bar-target="badge" hidden></span>
+            </button>
             <div class="status-bar-panel" data-status-bar-target="panel"
                  data-action="mouseenter->status-bar#keepPanel mouseleave->status-bar#hidePanelWithDelay">
                 <div class="status-bar-panel-header">
@@ -46,12 +48,29 @@
                 </div>
                 <div class="status-bar-panel-body" data-status-bar-target="body"></div>
             </div>
-            <div id="status-bar" class="status-bar" data-action="click->status-bar#togglePanel">
-                <span id="status-bar-text" class="status-bar-text"></span>
-                <span class="status-bar-badge" data-status-bar-target="badge" hidden></span>
-            </div>
         </div>
+    </header>
+
+    {% if admin_section %}
+        {{ include('admin/_tabs.html.twig') }}
+    {% endif %}
+
+    <main class="app-main">
+        <turbo-frame id="flash">
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="flash flash-{{ type }}" role="status">{{ message }}</div>
+                {% endfor %}
+            {% endfor %}
+        </turbo-frame>
+        {% block body %}{% endblock %}
+    </main>
+
+    {# Progress line written by the explorer controllers; hidden while empty. #}
+    <div id="status-bar" class="status-bar" role="status" aria-live="polite">
+        <span id="status-bar-text"></span>
     </div>
+
     {% block javascripts %}{% endblock %}
 </body>
 </html>

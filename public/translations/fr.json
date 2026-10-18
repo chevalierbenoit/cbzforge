@@ -126,5 +126,11 @@
     "js.tasks_admin.confirm_restart": "Redémarrer le worker ?",
     "js.tasks_admin.confirm_delete": "Supprimer cette tâche ?",
     "js.tasks_admin.confirm_retry": "Réessayer cette tâche ?",
-    "js.tasks_admin.confirm_purge": "Purger toutes les tâches terminées et échouées ?"
+    "js.tasks_admin.confirm_purge": "Purger toutes les tâches terminées et échouées ?",
+    "js.explore.has_metadata": "Métadonnées",
+    "js.explore.no_metadata": "Sans métadonnées",
+    "js.explore.scrape_failed": "Introuvable",
+    "js.scrape.section_series": "Série et numéro",
+    "js.scrape.section_credits": "Crédits",
+    "js.scrape.section_edition": "Édition et contenu"
 }

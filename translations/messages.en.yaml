@@ -17,7 +17,7 @@ dashboard.browse: Browse
 
 # Explore
 explore.root: Root
-explore.back: '← Back'
+explore.back: Back
 explore.search: Search
 explore.rename: Rename
 explore.convert_to_cbz: Convert to CBZ
@@ -77,8 +77,8 @@ admin.conversion.saved: Conversion settings saved.
 # Admin — Tasks
 admin.tasks.title: Task queue
 admin.tasks.worker: Worker…
-admin.tasks.restart_worker: ⟳ Restart worker
-admin.tasks.purge_completed_failed: 🧹 Purge completed/failed
+admin.tasks.restart_worker: Restart worker
+admin.tasks.purge_completed_failed: Purge completed/failed
 admin.tasks.type: Type
 admin.tasks.file: File
 admin.tasks.status: Status
@@ -127,3 +127,30 @@ error.rename_failed_to: 'Unable to rename to: %path%'
 # Status bar
 status_bar.queue: Task queue
 status_bar.see_all: 'See all →'
+
+# Redesign: page leads, helpers and status labels
+nav.main: Main navigation
+admin.conversion.lead: Image quality used when a PDF is converted to CBZ.
+admin.conversion.format_help: JPEG files are smaller; PNG keeps sharp edges without compression artefacts.
+admin.conversion.dpi_help: 150 DPI is enough for most screens; use 300 DPI for printing or large displays.
+admin.libraries.lead: Folders on the server that cbzforge reads as comic libraries.
+admin.libraries.path_help: Absolute path as seen by the server (inside the container when running with Docker).
+admin.rename.lead: Build file names from comic metadata. The preview uses an example comic.
+admin.settings.lead: Metadata sources. A source is offered only when it is enabled and configured.
+admin.settings.enable: Enable this source
+admin.settings.not_configured_help: Fill in the required settings and save to enable this source.
+admin.tasks.lead: Background jobs such as scraping, conversion and renaming. Retry failed jobs or clear finished ones.
+admin.tasks.delete: Delete task
+admin.tasks.retry: Retry task
+dashboard.empty_hint: Add the folder that contains your comics (CBZ, CBR or PDF). cbzforge reads it in place.
+explore.actions: Actions on the selected files
+explore.folders: Folders
+explore.has_metadata: Metadata
+explore.metadata: Metadata of the selected comic
+explore.location: Location
+explore.needs_conversion: Needs conversion (%ext%)
+explore.needs_conversion_hint: Convert to CBZ to read and edit its metadata.
+explore.no_folders: No sub-folder here.
+explore.no_metadata: No metadata
+explore.rename_hint: Rename the selected files with the naming expression
+explore.search_hint: Search metadata for the selected files

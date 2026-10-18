@@ -126,5 +126,11 @@
     "js.tasks_admin.confirm_restart": "Restart the worker?",
     "js.tasks_admin.confirm_delete": "Delete this task?",
     "js.tasks_admin.confirm_retry": "Retry this task?",
-    "js.tasks_admin.confirm_purge": "Purge all completed and failed tasks?"
+    "js.tasks_admin.confirm_purge": "Purge all completed and failed tasks?",
+    "js.explore.has_metadata": "Metadata",
+    "js.explore.no_metadata": "No metadata",
+    "js.explore.scrape_failed": "Not found",
+    "js.scrape.section_series": "Series and issue",
+    "js.scrape.section_credits": "Credits",
+    "js.scrape.section_edition": "Edition and content"
 }

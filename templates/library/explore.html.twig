@@ -1,22 +1,11 @@
 {% extends 'base.html.twig' %}
+{% import 'components/_icons.html.twig' as ui %}
 
 {% block title %}{{ library.name }} — cbzforge{% endblock %}
 
-{% block sidebar %}
-    <div class="sidebar-header">{{ 'sidebar.navigation'|trans }}</div>
-    <a href="{{ path('dashboard') }}" class="sidebar-item">⌂ {{ 'nav.dashboard'|trans }}</a>
-    <div class="sidebar-header">{{ 'sidebar.libraries'|trans }}</div>
-    <div class="sidebar-item active">📁 {{ library.name }}</div>
-    {% set dirs = entries|filter(e => e.type == 'dir') %}
-    {% if parentPath is not null %}
-        <a href="{{ path('library_explore', {id: library.id, path: parentPath}) }}" class="sidebar-item sidebar-indent">{{ 'explore.back'|trans }}</a>
-    {% endif %}
-    {% for entry in dirs %}
-        <a href="{{ path('library_explore', {id: library.id, path: entry.path}) }}" class="sidebar-item sidebar-indent">📁 {{ entry.name }}</a>
-    {% endfor %}
-{% endblock %}
-
 {% block body %}
+{% set dirs = entries|filter(e => e.type == 'dir') %}
+{% set files = entries|filter(e => e.type == 'file') %}
 <div class="library-page-wrapper"
      data-controller="scrape rename"
      data-scrape-library-id-value="{{ library.id }}"
@@ -25,52 +14,67 @@
      data-rename-library-id-value="{{ library.id }}"
      data-rename-locale-value="{{ app.request.locale }}">
 
-    <div class="top-bar">
-        <div class="breadcrumb">
-            <a href="{{ path('library_explore', {id: library.id}) }}" class="breadcrumb-item">{{ 'explore.root'|trans }}</a>
-            {% if currentPath is not empty %}
-                {% set segments = currentPath|split('/') %}
-                {% set cumul = '' %}
-                {% for segment in segments %}
-                    {% set cumul = cumul ~ (loop.first ? '' : '/') ~ segment %}
-                    <span class="breadcrumb-sep">/</span>
-                    {% if loop.last %}
-                        <span class="breadcrumb-current">{{ segment }}</span>
-                    {% else %}
-                        <a href="{{ path('library_explore', {id: library.id, path: cumul}) }}" class="breadcrumb-item">{{ segment }}</a>
-                    {% endif %}
-                {% endfor %}
-            {% endif %}
+    <header class="explorer-toolbar">
+        <div class="explorer-title">
+            <nav class="breadcrumb" aria-label="{{ 'explore.location'|trans }}">
+                <a href="{{ path('library_explore', {id: library.id}) }}" class="breadcrumb-item">{{ library.name }}</a>
+                {% if currentPath is not empty %}
+                    {% set segments = currentPath|split('/') %}
+                    {% set cumul = '' %}
+                    {% for segment in segments %}
+                        {% set cumul = cumul ~ (loop.first ? '' : '/') ~ segment %}
+                        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+                        {% if loop.last %}
+                            <span class="breadcrumb-current" aria-current="page">{{ segment }}</span>
+                        {% else %}
+                            <a href="{{ path('library_explore', {id: library.id, path: cumul}) }}" class="breadcrumb-item">{{ segment }}</a>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+            </nav>
+            <span class="explorer-count">{{ files|length }} {{ 'explore.file'|trans({count: files|length}) }}{% if dirs is not empty %}, {{ dirs|length }} {{ 'explore.folder'|trans({count: dirs|length}) }}{% endif %}</span>
         </div>
 
-        <div class="metadata-actions">
-            <button class="btn btn-secondary btn-sm metadata-action-btn"
+        <div class="metadata-actions" role="toolbar" aria-label="{{ 'explore.actions'|trans }}">
+            <span class="selection-counter" id="selection-counter" aria-live="polite"></span>
+            <button class="btn btn-sm metadata-action-btn"
                     data-action="scrape#searchFiles"
-                    disabled>{{ 'explore.search'|trans }}</button>
+                    title="{{ 'explore.search_hint'|trans }}"
+                    disabled>{{ ui.icon('search') }}{{ 'explore.search'|trans }}</button>
             {% if 'BDGest' in scrapers %}
-            <button id="url-scrape-btn" class="btn btn-sm btn-ghost metadata-action-btn"
+            <button id="url-scrape-btn" class="btn btn-sm metadata-action-btn"
                     data-action="scrape#urlScrape"
                     disabled style="display: none;">BDGest</button>
             {% endif %}
-            <span class="selection-counter" id="selection-counter"></span>
-            <button id="rename-btn" class="btn btn-sm btn-secondary metadata-action-btn"
+            <button id="rename-btn" class="btn btn-sm metadata-action-btn"
                     data-action="rename#smartPreview"
+                    title="{{ 'explore.rename_hint'|trans }}"
                     disabled>{{ 'explore.rename'|trans }}</button>
-            <button id="convert-btn" class="btn btn-sm btn-secondary metadata-action-btn"
+            <button id="convert-btn" class="btn btn-sm metadata-action-btn"
                     data-action="rename#convert"
                     disabled style="display: none;">{{ 'explore.convert_to_cbz'|trans }}</button>
         </div>
-    </div>
+    </header>
 
     <div class="library-layout">
+        <aside class="explorer-tree" aria-label="{{ 'explore.folders'|trans }}">
+            <div class="explorer-tree-title">{{ 'explore.folders'|trans }}</div>
+            {% if parentPath is not null %}
+                <a href="{{ path('library_explore', {id: library.id, path: parentPath}) }}" class="tree-link is-back">{{ ui.icon('back') }}{{ 'explore.back'|trans }}</a>
+            {% endif %}
+            {% for entry in dirs %}
+                <a href="{{ path('library_explore', {id: library.id, path: entry.path}) }}" class="tree-link is-child">{{ ui.icon('folder') }}{{ entry.name }}</a>
+            {% else %}
+                <p class="form-help" style="padding: 0.5rem 1rem;">{{ 'explore.no_folders'|trans }}</p>
+            {% endfor %}
+        </aside>
+
         <div class="browser-column" data-controller="inline-rename" data-inline-rename-library-id-value="{{ library.id }}">
-            {% set dirs = entries|filter(e => e.type == 'dir') %}
-            {% set files = entries|filter(e => e.type == 'file') %}
             {% if files is not empty or dirs is not empty %}
             <div class="file-grid">
                 {% for entry in dirs %}
                 <a class="folder-card" href="{{ path('library_explore', {id: library.id, path: entry.path}) }}">
-                    <div class="folder-card-icon">📁</div>
+                    <div class="folder-card-icon">{{ ui.icon('folder') }}</div>
                     <div class="file-card-body">
                         <div class="file-card-name">{{ entry.name }}</div>
                     </div>
@@ -86,54 +90,46 @@
                             <img src="{{ path('file_cover', {path: entry.path, library_id: library.id}) }}" alt=""
                                  loading="lazy"
                                  onerror="this.style.display='none';this.parentElement.querySelector('.file-icon').style.display='flex'">
-                            <div class="file-icon" style="display:none;">📄</div>
+                            <div class="file-icon" style="display:none;">{{ ui.icon('image') }}</div>
                         {% else %}
-                            <div class="file-icon">📦</div>
+                            <div class="file-icon">{{ ui.icon('file') }}</div>
                         {% endif %}
                     </div>
                     <div class="file-card-body">
-                        <div class="file-card-name">{{ entry.name }}</div>
+                        <div class="file-card-name" title="{{ entry.name }}">{{ entry.name }}</div>
                         {% if entry.extension == 'cbz' %}
                             {% if entry.has_metadata %}
-                                <span class="badge badge-success">✓</span>
+                                <span class="badge badge-success">{{ 'explore.has_metadata'|trans }}</span>
                             {% else %}
-                                <span class="badge badge-danger">✗</span>
+                                <span class="badge badge-neutral">{{ 'explore.no_metadata'|trans }}</span>
                             {% endif %}
                         {% elseif entry.extension != '' %}
-                            <span class="badge badge-warning">{{ entry.extension }}</span>
+                            <span class="badge badge-warning" title="{{ 'explore.needs_conversion_hint'|trans }}">{{ 'explore.needs_conversion'|trans({'%ext%': entry.extension|upper}) }}</span>
                         {% endif %}
                     </div>
                 </div>
                 {% endfor %}
             </div>
             {% else %}
-                <p style="color: var(--text-subtle); font-size: 0.85rem; padding: 2rem; text-align: center;">
-                    {{ 'explore.no_files'|trans }}
-                </p>
+                <div class="empty-state">
+                    {{ ui.icon('folder') }}
+                    <p>{{ 'explore.no_files'|trans }}</p>
+                </div>
             {% endif %}
         </div>
 
-        <div id="metadata-display" class="metadata-panel" style="display:none;">
+        <aside id="metadata-display" class="metadata-panel" aria-label="{{ 'explore.metadata'|trans }}">
             <button type="button" id="metadata-close" class="metadata-close-btn"
                     data-action="scrape#closeMetadata"
-                    title="{{ 'explore.close'|trans }}">×</button>
+                    aria-label="{{ 'explore.close'|trans }}" title="{{ 'explore.close'|trans }}">&times;</button>
             <div id="metadata-content">
-                {{ 'explore.select_file'|trans }}
+                <p class="form-help">{{ 'explore.select_file'|trans }}</p>
             </div>
-        </div>
+        </aside>
     </div>
 
     <div data-controller="modal" class="modal-overlay" data-action="click->modal#closeBackdrop">
         <div class="modal-dialog" data-modal-target="content"></div>
     </div>
 </div>
-
-{% set fileCount = entries|filter(e => e.type == 'file')|length %}
-{% set dirCount = entries|filter(e => e.type == 'dir')|length %}
-<script>
-    (function() {
-        var sb = document.getElementById('status-bar-text') || document.getElementById('status-bar');
-        if (sb) sb.textContent = '{{ fileCount }} {{ 'explore.file'|trans({ count: fileCount }) }}{{ fileCount > 1 ? 's' : '' }}, {{ dirCount }} {{ 'explore.folder'|trans({ count: dirCount }) }}{{ dirCount > 1 ? 's' : '' }}';
-    })();
-</script>
 {% endblock %}

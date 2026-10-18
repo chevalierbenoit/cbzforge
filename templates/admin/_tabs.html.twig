@@ -1,0 +1,21 @@
+{% import 'components/_icons.html.twig' as ui %}
+<nav class="subnav" aria-label="{{ 'nav.administration'|trans }}">
+    <ul class="subnav-list">
+    {% set admin_items = [
+        {route: 'admin_libraries', label: 'sidebar.libraries'},
+        {route: 'admin_settings', label: 'admin.scrapers'},
+        {route: 'admin_rename_settings', label: 'admin.rename'},
+        {route: 'admin_conversion_settings', label: 'admin.conversion'},
+        {route: 'admin_tasks', label: 'admin.task_queue'},
+    ] %}
+    {% for item in admin_items %}
+        <li>
+            {% if app.current_route starts with item.route %}
+                <a href="{{ path(item.route) }}" class="subnav-link is-active" aria-current="page">{{ item.label|trans }}</a>
+            {% else %}
+                <a href="{{ path(item.route) }}" class="subnav-link">{{ item.label|trans }}</a>
+            {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+</nav>
