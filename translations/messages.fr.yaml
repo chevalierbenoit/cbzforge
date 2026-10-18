@@ -17,7 +17,7 @@ dashboard.browse: Parcourir
 
 # Explore
 explore.root: Racine
-explore.back: ← Retour
+explore.back: Retour
 explore.search: Rechercher
 explore.rename: Renommer
 explore.convert_to_cbz: Convertir en CBZ
@@ -77,8 +77,8 @@ admin.conversion.saved: Configuration de conversion enregistrée.
 # Admin — Tasks
 admin.tasks.title: File d'attente
 admin.tasks.worker: Worker…
-admin.tasks.restart_worker: ⟳ Redémarrer le worker
-admin.tasks.purge_completed_failed: 🧹 Purger terminées/échouées
+admin.tasks.restart_worker: Redémarrer le worker
+admin.tasks.purge_completed_failed: Purger terminées/échouées
 admin.tasks.type: Type
 admin.tasks.file: Fichier
 admin.tasks.status: Statut
@@ -127,3 +127,31 @@ error.rename_failed_to: 'Impossible de renommer vers : %path%'
 # Status bar
 status_bar.queue: File d'attente
 status_bar.see_all: 'Voir tout →'
+
+# Refonte : sous-titres de page, aides et libellés de statut
+nav.main: Navigation principale
+admin.conversion.lead: Qualité des images utilisée lors de la conversion d'un PDF en CBZ.
+admin.conversion.format_help: Les JPEG sont plus légers ; les PNG gardent les contours nets sans artefacts de compression.
+admin.conversion.dpi_help: 150 DPI suffisent pour la plupart des écrans ; 300 DPI pour l'impression ou les grands écrans.
+admin.libraries.lead: Dossiers du serveur que cbzforge lit comme bibliothèques de BD.
+admin.libraries.path_help: Chemin absolu tel que vu par le serveur (dans le conteneur avec Docker).
+admin.rename.lead: Construit les noms de fichiers à partir des métadonnées. L'aperçu utilise un exemple.
+admin.settings.lead: Sources de métadonnées. Une source n'est proposée que si elle est activée et configurée.
+admin.settings.enable: Activer cette source
+admin.settings.not_configured_help: Renseignez les champs obligatoires puis enregistrez pour activer cette source.
+admin.tasks.lead: Traitements en arrière-plan (scrape, conversion, renommage). Relancez les échecs ou videz les terminés.
+admin.tasks.delete: Supprimer la tâche
+admin.tasks.retry: Relancer la tâche
+dashboard.empty_hint: Ajoutez le dossier qui contient vos BD (CBZ, CBR ou PDF). cbzforge le lit sur place.
+explore.actions: Actions sur les fichiers sélectionnés
+explore.folders: Dossiers
+explore.has_metadata: Métadonnées
+explore.metadata: Métadonnées de la BD sélectionnée
+explore.location: Emplacement
+explore.needs_conversion: Conversion requise (%ext%)
+explore.needs_conversion_hint: Convertissez en CBZ pour lire et modifier ses métadonnées.
+explore.no_folders: Aucun sous-dossier ici.
+explore.no_metadata: Sans métadonnées
+explore.rename_hint: Renommer les fichiers sélectionnés avec l'expression de renommage
+explore.search_hint: Rechercher les métadonnées des fichiers sélectionnés
+theme.toggle: Changer de thème clair / sombre

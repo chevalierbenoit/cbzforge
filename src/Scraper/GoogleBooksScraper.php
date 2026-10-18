@@ -112,31 +112,25 @@ class GoogleBooksScraper implements ScraperInterface
             $year = (int) substr($info['publishedDate'], 0, 4);
         }
 
-        // Try seriesInfo from Google Books API first
+        // seriesId is an opaque Google identifier, not a name: the series comes from the title.
         $series = null;
         $number = null;
         $title = $info['title'] ?? null;
 
-        if (isset($info['seriesInfo']['volumeSeries'][0])) {
-            $vs = $info['seriesInfo']['volumeSeries'][0];
-            if (!empty($vs['seriesId'])) {
-                $series = $vs['seriesId'];
-            }
-            if (isset($vs['orderNumber'])) {
-                $number = $vs['orderNumber'];
-            }
-            // Use subtitle as the volume title when seriesInfo is present
-            if (!empty($info['subtitle'])) {
-                $title = $info['subtitle'];
-            }
+        if (isset($info['seriesInfo']['volumeSeries'][0]['orderNumber'])) {
+            $number = $info['seriesInfo']['volumeSeries'][0]['orderNumber'];
         }
 
-        // Fallback: parse French BD patterns from the title
-        if (!$series && $title) {
+        if ($title) {
             [$parsedSeries, $parsedNumber, $parsedTitle] = $this->parseBdTitle($title);
             $series = $parsedSeries;
             $number = $parsedNumber ?? $number;
             $title = $parsedTitle ?? $title;
+        }
+
+        // The subtitle is the volume title when Google provides a series
+        if (isset($info['seriesInfo']['volumeSeries'][0]) && !empty($info['subtitle'])) {
+            $title = $info['subtitle'];
         }
 
         return new ComicInfo(

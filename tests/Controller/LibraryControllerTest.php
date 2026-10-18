@@ -61,6 +61,27 @@ class LibraryControllerTest extends WebTestCase
         $this->assertStringEndsWith('path=Serie%20A', $folder->attr('href'));
     }
 
+    public function testFolderTreeExpandsCurrentPath(): void
+    {
+        mkdir($this->tmpDir.'/Serie A/Tome 1', 0777, true);
+        mkdir($this->tmpDir.'/Autre', 0777, true);
+
+        $client = static::createClient();
+        $em = $client->getContainer()->get('doctrine.orm.entity_manager');
+        $library = new Library();
+        $library->setName('Test');
+        $library->setPath($this->tmpDir);
+        $em->persist($library);
+        $em->flush();
+
+        $crawler = $client->request('GET', '/library/'.$library->getId().'?path=Serie%20A');
+
+        // The current folder is the active link, its siblings stay visible, its children are shown.
+        $this->assertSame('Serie A', trim($crawler->filter('.tree-link.is-active')->text()));
+        $this->assertStringContainsString('Autre', $crawler->filter('.explorer-tree')->text());
+        $this->assertStringContainsString('Tome 1', $crawler->filter('.explorer-tree')->text());
+    }
+
     public function testExploreWithSubPath(): void
     {
         $client = static::createClient();

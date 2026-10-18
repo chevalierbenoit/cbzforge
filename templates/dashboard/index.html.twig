@@ -1,44 +1,43 @@
 {% extends 'base.html.twig' %}
+{% import 'components/_icons.html.twig' as ui %}
 
-{% block title %}{{ 'nav.dashboard'|trans }} — cbzforge{% endblock %}
-
-{% block sidebar %}
-    <div class="sidebar-header">{{ 'sidebar.navigation'|trans }}</div>
-    <div class="sidebar-item active">⌂ {{ 'nav.dashboard'|trans }}</div>
-{% endblock %}
+{% block title %}{{ 'sidebar.libraries'|trans }} — cbzforge{% endblock %}
 
 {% block body %}
-<div class="page-wrapper">
+<div class="page">
     <div class="page-header">
-        <h1>{{ 'dashboard.my_libraries'|trans }}</h1>
+        <div>
+            <h1>{{ 'dashboard.my_libraries'|trans }}</h1>
+        </div>
         {% if libraries is not empty %}
-            <a href="{{ path('admin_libraries') }}" class="btn btn-secondary btn-sm">{{ 'dashboard.manage'|trans }}</a>
+            <div class="page-actions">
+                <a href="{{ path('admin_libraries') }}" class="btn">{{ ui.icon('settings') }}{{ 'dashboard.manage'|trans }}</a>
+            </div>
         {% endif %}
     </div>
 
     {% if libraries is empty %}
-        <p style="color: var(--text-muted); margin: 2rem 0;">{{ 'dashboard.no_libraries'|trans }}</p>
-        <a href="{{ path('admin_libraries') }}" class="btn btn-primary">{{ 'dashboard.configure_library'|trans }}</a>
-    {% else %}
-        <div class="stat-cards">
-            <div class="stat-card">
-                <div class="stat-card-label">{{ 'dashboard.libraries'|trans }}</div>
-                <div class="stat-card-value">{{ libraries|length }}</div>
+        <div class="card">
+            <div class="empty-state">
+                {{ ui.icon('library') }}
+                <h2>{{ 'dashboard.no_libraries'|trans }}</h2>
+                <p>{{ 'dashboard.empty_hint'|trans }}</p>
+                <a href="{{ path('admin_libraries') }}" class="btn btn-primary">{{ ui.icon('plus') }}{{ 'dashboard.configure_library'|trans }}</a>
             </div>
         </div>
-
+    {% else %}
         <div class="library-grid">
             {% for library in libraries %}
-            <div class="library-card">
-                <div class="library-card-icon" style="background: {% if loop.index is odd %}#6366f1{% else %}#22d3ee{% endif %}20; color: {% if loop.index is odd %}#6366f1{% else %}#22d3ee{% endif %};">
-                    📚
+            <article class="library-card">
+                <div class="library-card-head">
+                    <span class="library-card-icon">{{ ui.icon('library') }}</span>
+                    <div class="library-card-info">
+                        <div class="library-card-name">{{ library.name }}</div>
+                        <div class="library-card-path" title="{{ library.path }}">{{ library.path }}</div>
+                    </div>
                 </div>
-                <div class="library-card-info">
-                    <div class="library-card-name">{{ library.name }}</div>
-                    <div class="library-card-path">{{ library.path }}</div>
-                </div>
-                <a href="{{ path('library_explore', {id: library.id}) }}" class="btn btn-primary btn-sm">{{ 'dashboard.browse'|trans }}</a>
-            </div>
+                <a href="{{ path('library_explore', {id: library.id}) }}" class="btn btn-primary">{{ ui.icon('folder') }}{{ 'dashboard.browse'|trans }}</a>
+            </article>
             {% endfor %}
         </div>
     {% endif %}

@@ -1,51 +1,61 @@
 {% extends 'base.html.twig' %}
+{% import 'components/_icons.html.twig' as ui %}
 
 {% block title %}{{ 'admin.settings.scrapers'|trans }} — cbzforge{% endblock %}
 
-{% block sidebar %}
-    {{ include('admin/_sidebar.html.twig') }}
-{% endblock %}
-
 {% block body %}
-<div class="page-wrapper">
+<div class="page">
     <div class="page-header">
-        <h1>{{ 'admin.settings.scrapers'|trans }}</h1>
+        <div>
+            <h1>{{ 'admin.settings.scrapers'|trans }}</h1>
+            <p class="page-lead">{{ 'admin.settings.lead'|trans }}</p>
+        </div>
     </div>
 
-    <form method="post" action="{{ path('admin_settings') }}">
+    <form method="post" action="{{ path('admin_settings') }}" class="stack">
     {% for scraper in scrapers %}
         {% set scraper_slug = scraper.name|replace({' ': '_'}) %}
-        <div class="settings-card">
-            <div class="settings-card-header">
-                <input type="hidden" name="scraper_enabled_{{ scraper_slug }}" value="0">
-                <input type="checkbox" name="scraper_enabled_{{ scraper_slug }}" id="toggle-{{ scraper_slug }}" value="1"
-                       {% if scraper.enabled and scraper.configured %}checked{% endif %}
-                       {% if not scraper.configured %}disabled{% endif %}
-                       style="width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer;">
-                <span class="settings-card-title">{{ scraper.name }}</span>
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">{{ scraper.name }}</h2>
                 {% if not scraper.enabled %}
                     <span class="badge badge-neutral">{{ 'admin.settings.inactive'|trans }}</span>
                 {% elseif not scraper.configured %}
-                    <span class="badge badge-warning">{{ 'admin.settings.not_configured'|trans }}</span>
+                    <span class="badge badge-warning">{{ ui.icon('alert') }}{{ 'admin.settings.not_configured'|trans }}</span>
                 {% else %}
-                    <span class="badge badge-success">{{ 'admin.settings.available'|trans }}</span>
+                    <span class="badge badge-success">{{ ui.icon('check') }}{{ 'admin.settings.available'|trans }}</span>
                 {% endif %}
             </div>
-            {% if scraper.fields is empty %}
-                <p style="color: var(--text-subtle); font-size: 0.8rem;">{{ 'admin.settings.no_config'|trans }}</p>
-            {% else %}
-                {% for field in scraper.fields %}
-                    <div class="form-group">
-                        <label for="settings-{{ field.key }}">{{ field.label }}</label>
-                        <input type="{{ field.type }}" id="settings-{{ field.key }}"
-                               name="{{ field.key }}" value="{{ field.value }}"
-                               {% if field.value %}placeholder="••••••••"{% endif %}>
+            <div class="card-body">
+                <input type="hidden" name="scraper_enabled_{{ scraper_slug }}" value="0">
+                <label class="form-checkbox">
+                    <input type="checkbox" name="scraper_enabled_{{ scraper_slug }}" id="toggle-{{ scraper_slug }}" value="1"
+                           {% if scraper.enabled and scraper.configured %}checked{% endif %}
+                           {% if not scraper.configured %}disabled{% endif %}>
+                    {{ 'admin.settings.enable'|trans }}
+                </label>
+                {% if not scraper.configured %}
+                    <p class="form-help">{{ 'admin.settings.not_configured_help'|trans }}</p>
+                {% endif %}
+
+                {% if scraper.fields is empty %}
+                    <p class="form-help">{{ 'admin.settings.no_config'|trans }}</p>
+                {% else %}
+                    <div class="form-grid" style="margin-top: 1rem;">
+                    {% for field in scraper.fields %}
+                        <div class="form-group">
+                            <label for="settings-{{ field.key }}">{{ field.label }}{% if field.required %} <span class="card-muted">*</span>{% endif %}</label>
+                            <input type="{{ field.type }}" id="settings-{{ field.key }}"
+                                   name="{{ field.key }}" value="{{ field.value }}" autocomplete="off"
+                                   {% if field.value %}placeholder="••••••••"{% endif %}>
+                        </div>
+                    {% endfor %}
                     </div>
-                {% endfor %}
-            {% endif %}
-        </div>
+                {% endif %}
+            </div>
+        </section>
     {% endfor %}
-        <div style="display: flex; justify-content: flex-end; margin-top: 1rem;">
+        <div class="form-actions">
             <button type="submit" class="btn btn-primary">{{ 'admin.save'|trans }}</button>
         </div>
     </form>

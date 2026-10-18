@@ -205,7 +205,7 @@ class GoogleBooksScraperTest extends TestCase
                 'subtitle' => 'Tome 40',
                 'seriesInfo' => [
                     'volumeSeries' => [
-                        ['seriesId' => 'Astérix', 'orderNumber' => 40],
+                        ['seriesId' => 'fAPsFwAAABCRFM', 'orderNumber' => 40],
                     ],
                 ],
                 'authors' => ['Fabcaro'],
@@ -225,6 +225,37 @@ class GoogleBooksScraperTest extends TestCase
         $this->assertSame('Astérix', $info->series);
         $this->assertSame(40, $info->number);
         $this->assertSame('Tome 40', $info->title);
+    }
+
+    public function testScrapeNeverUsesOpaqueSeriesIdAsSeriesName(): void
+    {
+        $settings = $this->createMock(SettingsService::class);
+        $settings->expects(self::once())->method('has')->with('google_books_api_key')->willReturn(true);
+        $settings->method('get')->willReturn('test-key');
+
+        $responseData = [
+            'id' => 'vol123',
+            'volumeInfo' => [
+                'title' => 'Some Standalone Book',
+                'seriesInfo' => [
+                    'volumeSeries' => [
+                        ['seriesId' => 'fAPsFwAAABCRFM', 'orderNumber' => 1],
+                    ],
+                ],
+            ],
+        ];
+
+        $response = $this->createStub(ResponseInterface::class);
+        $response->method('getContent')->willReturn(json_encode($responseData));
+        $response->method('getStatusCode')->willReturn(200);
+
+        $httpClient = $this->createStub(HttpClientInterface::class);
+        $httpClient->method('request')->willReturn($response);
+
+        $scraper = new GoogleBooksScraper($httpClient, $settings);
+        $info = $scraper->scrape('vol123');
+
+        $this->assertNotSame('fAPsFwAAABCRFM', $info->series);
     }
 
     public function testScrapeParseFrenchBdTitleSeriesTitleNumber(): void

@@ -1,70 +1,75 @@
 {% extends 'base.html.twig' %}
+{% import 'components/_icons.html.twig' as ui %}
 
 {% block title %}{{ 'admin.tasks.title'|trans }} — cbzforge{% endblock %}
 
-{% block sidebar %}
-    {{ include('admin/_sidebar.html.twig') }}
-{% endblock %}
-
 {% block body %}
-<div class="page-wrapper" data-controller="tasks-admin" data-tasks-admin-locale-value="{{ app.request.locale }}">
+<div class="page" data-controller="tasks-admin" data-tasks-admin-locale-value="{{ app.request.locale }}">
     <div class="page-header">
-        <h1>{{ 'admin.tasks.title'|trans }}</h1>
-        <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <div>
+            <h1>{{ 'admin.tasks.title'|trans }}</h1>
+            <p class="page-lead">{{ 'admin.tasks.lead'|trans }}</p>
+        </div>
+        <div class="page-actions">
             <span class="badge badge-neutral" data-tasks-admin-target="workerBadge">
                 <span data-tasks-admin-target="workerLabel">{{ 'admin.tasks.worker'|trans }}</span>
             </span>
-            <button type="button" class="btn btn-secondary" data-action="tasks-admin#restartWorker">{{ 'admin.tasks.restart_worker'|trans }}</button>
-            <button type="button" class="btn btn-secondary" data-action="tasks-admin#purgeTasks">{{ 'admin.tasks.purge_completed_failed'|trans }}</button>
+            <button type="button" class="btn" data-action="tasks-admin#restartWorker">{{ ui.icon('refresh') }}{{ 'admin.tasks.restart_worker'|trans }}</button>
+            <button type="button" class="btn" data-action="tasks-admin#purgeTasks">{{ ui.icon('trash') }}{{ 'admin.tasks.purge_completed_failed'|trans }}</button>
         </div>
     </div>
 
-    <div class="settings-card" style="padding: 0;">
+    <section class="card">
         {% if tasks is not empty %}
-        <table>
-            <thead>
-                <tr>
-                    <th>{{ 'admin.tasks.type'|trans }}</th>
-                    <th>{{ 'admin.tasks.file'|trans }}</th>
-                    <th>{{ 'admin.tasks.status'|trans }}</th>
-                    <th>{{ 'admin.tasks.error'|trans }}</th>
-                    <th>{{ 'admin.tasks.created_at'|trans }}</th>
-                    <th>{{ 'admin.tasks.actions'|trans }}</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for task in tasks %}
-                <tr>
-                    <td>{{ task.type }}</td>
-                    <td><code>{{ task.path }}</code></td>
-                    <td>
-                        {% if task.status == 'pending' %}
-                            <span class="badge badge-neutral">{{ 'tasks.status.pending'|trans }}</span>
-                        {% elseif task.status == 'processing' %}
-                            <span class="badge badge-warning">{{ 'tasks.status.processing'|trans }}</span>
-                        {% elseif task.status == 'completed' %}
-                            <span class="badge badge-success">{{ 'tasks.status.completed'|trans }}</span>
-                        {% elseif task.status == 'failed' %}
-                            <span class="badge badge-danger">{{ 'tasks.status.failed'|trans }}</span>
-                        {% endif %}
-                    </td>
-                    <td>{% if task.error %}<code style="color: var(--danger);">{{ task.error }}</code>{% endif %}</td>
-                    <td style="color: var(--text-muted); font-size: 0.75rem;">{{ task.createdAt|date('d/m/Y H:i:s') }}</td>
-                    <td style="white-space: nowrap;">
-                        <button type="button" class="btn btn-sm btn-danger" data-id="{{ task.id }}" data-action="tasks-admin#deleteTask">🗑</button>
-                        {% if task.status in ['failed', 'processing'] %}
-                        <button type="button" class="btn btn-sm btn-secondary" data-id="{{ task.id }}" data-action="tasks-admin#retryTask">↻</button>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>{{ 'admin.tasks.type'|trans }}</th>
+                        <th>{{ 'admin.tasks.file'|trans }}</th>
+                        <th>{{ 'admin.tasks.status'|trans }}</th>
+                        <th>{{ 'admin.tasks.error'|trans }}</th>
+                        <th>{{ 'admin.tasks.created_at'|trans }}</th>
+                        <th><span class="sr-only">{{ 'admin.tasks.actions'|trans }}</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for task in tasks %}
+                    <tr>
+                        <td>{{ task.type }}</td>
+                        <td><code>{{ task.path }}</code></td>
+                        <td>
+                            {% if task.status == 'pending' %}
+                                <span class="badge badge-neutral">{{ 'tasks.status.pending'|trans }}</span>
+                            {% elseif task.status == 'processing' %}
+                                <span class="badge badge-warning">{{ 'tasks.status.processing'|trans }}</span>
+                            {% elseif task.status == 'completed' %}
+                                <span class="badge badge-success">{{ ui.icon('check') }}{{ 'tasks.status.completed'|trans }}</span>
+                            {% elseif task.status == 'failed' %}
+                                <span class="badge badge-danger">{{ ui.icon('alert') }}{{ 'tasks.status.failed'|trans }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{% if task.error %}<code>{{ task.error }}</code>{% endif %}</td>
+                        <td class="card-muted">{{ task.createdAt|date('d/m/Y H:i') }}</td>
+                        <td class="table-actions">
+                            {% if task.status in ['failed', 'processing'] %}
+                            <button type="button" class="btn btn-sm btn-icon" data-id="{{ task.id }}" data-action="tasks-admin#retryTask"
+                                    aria-label="{{ 'admin.tasks.retry'|trans }}" title="{{ 'admin.tasks.retry'|trans }}">{{ ui.icon('refresh') }}</button>
+                            {% endif %}
+                            <button type="button" class="btn btn-sm btn-icon btn-danger" data-id="{{ task.id }}" data-action="tasks-admin#deleteTask"
+                                    aria-label="{{ 'admin.tasks.delete'|trans }}" title="{{ 'admin.tasks.delete'|trans }}">{{ ui.icon('trash') }}</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-        <div style="padding: 2rem; text-align: center; color: var(--text-subtle); font-size: 0.85rem;">
-            {{ 'admin.tasks.none'|trans }}
+        <div class="empty-state">
+            {{ ui.icon('queue') }}
+            <p>{{ 'admin.tasks.none'|trans }}</p>
         </div>
         {% endif %}
-    </div>
+    </section>
 </div>
 {% endblock %}

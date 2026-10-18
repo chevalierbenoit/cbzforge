@@ -1,49 +1,72 @@
 {% extends 'base.html.twig' %}
+{% import 'components/_icons.html.twig' as ui %}
 
 {% block title %}{{ 'admin.libraries.manage'|trans }} — cbzforge{% endblock %}
 
-{% block sidebar %}
-    {{ include('admin/_sidebar.html.twig') }}
-{% endblock %}
-
 {% block body %}
-<div class="page-wrapper">
+<div class="page">
     <div class="page-header">
-        <h1>{{ 'admin.libraries.manage'|trans }}</h1>
+        <div>
+            <h1>{{ 'admin.libraries.manage'|trans }}</h1>
+            <p class="page-lead">{{ 'admin.libraries.lead'|trans }}</p>
+        </div>
     </div>
 
-    <div class="settings-card">
-        <h3>{{ 'admin.add_library'|trans }}</h3>
-        <form method="POST" action="{{ path('admin_libraries_add') }}" class="settings-form-row">
-            <input type="text" name="name" placeholder="{{ 'admin.name_placeholder'|trans }}" required style="flex: 1;">
-            <input type="text" name="path" placeholder="{{ 'admin.path_placeholder'|trans }}" required style="flex: 2;">
-            <button type="submit" class="btn btn-primary">{{ 'admin.add'|trans }}</button>
-        </form>
-    </div>
+    <div class="stack">
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">{{ 'admin.add_library'|trans }}</h2>
+            </div>
+            <form method="POST" action="{{ path('admin_libraries_add') }}" class="card-body">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="library-name">{{ 'admin.name_placeholder'|trans }}</label>
+                        <input type="text" id="library-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="library-path">{{ 'admin.path_placeholder'|trans }}</label>
+                        <input type="text" id="library-path" name="path" required placeholder="/chemin/vers/dossier">
+                        <span class="form-help">{{ 'admin.libraries.path_help'|trans }}</span>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">{{ ui.icon('plus') }}{{ 'admin.add'|trans }}</button>
+                </div>
+            </form>
+        </section>
 
-    <h3>{{ 'sidebar.libraries'|trans }}</h3>
-    <div class="settings-card" style="padding: 0;">
-        {% for library in libraries %}
-        <div class="admin-list-row">
-            <div class="admin-list-info">
-                <div class="admin-list-name">{{ library.name }}</div>
-                <div class="admin-list-path"><code>{{ library.path }}</code></div>
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">{{ 'sidebar.libraries'|trans }}</h2>
+                <span class="card-muted">{{ libraries|length }}</span>
             </div>
-            <div class="admin-list-actions">
-                <a href="{{ path('library_explore', {id: library.id}) }}" class="btn btn-secondary btn-sm">{{ 'admin.browse'|trans }}</a>
-                <a href="{{ path('admin_libraries_edit', {id: library.id}) }}" class="btn btn-secondary btn-sm">{{ 'admin.edit'|trans }}</a>
-                <form method="POST" action="{{ path('admin_libraries_delete', {id: library.id}) }}" style="display: inline;"
-                      data-turbo="false"
-                      onsubmit="return confirm('{{ 'admin.confirm_delete'|trans }}')">
-                    <button type="submit" class="btn btn-danger btn-sm">{{ 'admin.delete'|trans }}</button>
-                </form>
-            </div>
-        </div>
-        {% else %}
-        <div style="padding: 2rem; text-align: center; color: var(--text-subtle); font-size: 0.85rem;">
-            {{ 'admin.no_libraries'|trans }}
-        </div>
-        {% endfor %}
+            {% if libraries is empty %}
+                <div class="empty-state">
+                    {{ ui.icon('library') }}
+                    <p>{{ 'admin.no_libraries'|trans }}</p>
+                </div>
+            {% else %}
+                <ul class="list">
+                {% for library in libraries %}
+                    <li class="list-row">
+                        <div class="list-main">
+                            <div class="list-title">{{ library.name }}</div>
+                            <div class="list-meta"><code>{{ library.path }}</code></div>
+                        </div>
+                        <div class="list-actions">
+                            <a href="{{ path('library_explore', {id: library.id}) }}" class="btn btn-sm">{{ ui.icon('folder') }}{{ 'admin.browse'|trans }}</a>
+                            <a href="{{ path('admin_libraries_edit', {id: library.id}) }}" class="btn btn-sm">{{ ui.icon('edit') }}{{ 'admin.edit'|trans }}</a>
+                            <form method="POST" action="{{ path('admin_libraries_delete', {id: library.id}) }}" class="inline-form"
+                                  data-turbo="false"
+                                  onsubmit="return confirm('{{ 'admin.confirm_delete'|trans|e('js') }}')">
+                                <button type="submit" class="btn btn-sm btn-danger">{{ ui.icon('trash') }}{{ 'admin.delete'|trans }}</button>
+                            </form>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </section>
     </div>
 </div>
 {% endblock %}
