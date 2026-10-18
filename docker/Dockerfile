@@ -1,3 +1,20 @@
+# unrar: reads RAR archives (CBR). Built from RARLAB's official source, pinned by checksum,
+# so the image does not depend on a distribution package. The source may be used and
+# distributed freely; see the licence in the unrar source tree.
+FROM php:8.4-fpm-alpine AS unrar
+
+ARG UNRAR_VERSION=7.3.1
+ARG UNRAR_SHA256=634900842a3737d9cc15bbcc71d4c74cc713437e0bca296a573424fe5f2660ab
+
+RUN apk add --no-cache g++ make \
+    && wget -qO /tmp/unrar.tar.gz "https://www.rarlab.com/rar/unrarsrc-${UNRAR_VERSION}.tar.gz" \
+    && echo "${UNRAR_SHA256}  /tmp/unrar.tar.gz" | sha256sum -c - \
+    && mkdir /tmp/unrar-src \
+    && tar -xzf /tmp/unrar.tar.gz -C /tmp/unrar-src --strip-components=1 \
+    && make -C /tmp/unrar-src -f makefile CXX=g++ \
+    && install -m 0755 /tmp/unrar-src/unrar /usr/local/bin/unrar \
+    && test -x /usr/local/bin/unrar
+
 FROM php:8.4-fpm-alpine
 
 ENV APP_ENV=prod \
@@ -11,34 +28,15 @@ RUN apk add --no-cache \
     libzip-dev \
     freetype-dev libjpeg-turbo-dev libpng-dev \
     caddy poppler-utils supervisor \
+    libstdc++ \
     && apk add --no-cache su-exec \
-    && apk add --no-cache unrar-free --repository=https://dl-cdn.alpinelinux.org/alpine/edge/testing \
     && docker-php-ext-install zip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd
 
-# RAR5-capable archive reader; unrar-free only decodes pre-RAR5 archives.
-# ConversionService prefers this extension over the unrar CLI fallback.
-# Built from git: PECL's latest release (4.2.0) predates the PHP 8.4 API.
-# Pinned to a commit so the build does not change silently when upstream moves.
-ARG PHP_RAR_COMMIT=9c8fcd9ebc9feaf36f945d6d7407fdcd57b7136f
-RUN apk add --no-cache --virtual .rar-build-deps $PHPIZE_DEPS git \
-    && git init -q /tmp/php-rar \
-    && cd /tmp/php-rar \
-    && git fetch -q --depth 1 https://github.com/cataphract/php-rar "$PHP_RAR_COMMIT" \
-    && git checkout -q FETCH_HEAD \
-    && phpize -q >/dev/null \
-    && ./configure -q >/dev/null \
-    && make -j"$(nproc)" >/dev/null \
-    && make install >/dev/null \
-    && docker-php-ext-enable rar \
-    && apk del .rar-build-deps \
-    && rm -rf /tmp/php-rar
+COPY --from=unrar /usr/local/bin/unrar /usr/local/bin/unrar
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-# CLI fallback for CBR conversion (ConversionService calls `unrar`).
-RUN ln -s /usr/bin/unrar-free /usr/local/bin/unrar \
-    && test -x /usr/local/bin/unrar
 
 WORKDIR /app
 

@@ -70,22 +70,35 @@ class ArchiveService
             return null;
         }
 
-        $imageExtensions = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
-        $mimeMap = [
-            'jpg' => 'image/jpeg',
-            'jpeg' => 'image/jpeg',
-            'png' => 'image/png',
-            'webp' => 'image/webp',
-            'gif' => 'image/gif',
-        ];
-
-        $images = [];
-        foreach ($contents as $entry) {
-            $ext = strtolower(pathinfo($entry, \PATHINFO_EXTENSION));
-            if (\in_array($ext, $imageExtensions, true)) {
-                $images[] = $entry;
-            }
+        $best = self::selectCoverEntry($contents);
+        if (null === $best) {
+            return null;
         }
+
+        try {
+            $content = $this->extractPage($path, $best);
+        } catch (\RuntimeException) {
+            return null;
+        }
+
+        return [
+            'content' => $content,
+            'mime' => self::imageMime($best),
+        ];
+    }
+
+    /**
+     * Picks the cover among archive entries: a conventional cover name wins, otherwise the
+     * first image in natural order. Returns null when there is no image.
+     *
+     * @param list<string> $entries
+     */
+    public static function selectCoverEntry(array $entries): ?string
+    {
+        $images = array_values(array_filter(
+            $entries,
+            static fn (string $entry): bool => null !== self::imageMime($entry),
+        ));
 
         if (empty($images)) {
             return null;
@@ -94,22 +107,21 @@ class ArchiveService
         natsort($images);
         $images = array_values($images);
 
-        $coverCandidates = ['cover.jpg', 'cover.png', '000.jpg', '000.png'];
-        $candidates = array_intersect($coverCandidates, $images);
-        $best = $candidates ? reset($candidates) : $images[0];
+        $candidates = array_intersect(['cover.jpg', 'cover.png', '000.jpg', '000.png'], $images);
 
-        try {
-            $content = $this->extractPage($path, $best);
-        } catch (\RuntimeException) {
-            return null;
-        }
+        return $candidates ? reset($candidates) : $images[0];
+    }
 
-        $ext = strtolower(pathinfo($best, \PATHINFO_EXTENSION));
-
-        return [
-            'content' => $content,
-            'mime' => $mimeMap[$ext],
-        ];
+    /** MIME type of an image entry, or null when the name is not a supported image. */
+    public static function imageMime(string $entry): ?string
+    {
+        return match (strtolower(pathinfo($entry, \PATHINFO_EXTENSION))) {
+            'jpg', 'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'webp' => 'image/webp',
+            'gif' => 'image/gif',
+            default => null,
+        };
     }
 
     public function assertNotCbr(string $path): void

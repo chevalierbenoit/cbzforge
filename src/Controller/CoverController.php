@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Library;
-use App\Service\ArchiveService;
+use App\Service\CoverService;
 use App\Service\LibraryService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -16,7 +16,7 @@ class CoverController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $em,
         private readonly LibraryService $libraryService,
-        private readonly ArchiveService $archiveService,
+        private readonly CoverService $coverService,
     ) {
     }
 
@@ -37,7 +37,7 @@ class CoverController extends AbstractController
 
         try {
             $fullPath = $this->libraryService->getFullPath($library, $path);
-            $image = $this->archiveService->getFirstImage($fullPath);
+            $image = $this->coverService->getCover($fullPath);
 
             if (!$image) {
                 return $this->renderErrorCover();
