@@ -54,6 +54,12 @@ class FilenameParserTest extends TestCase
 
             'multiple numbers' => ['Spawn_01_02.cbz', 'Spawn 01', 2, null],
             'number not at end' => ['Spawn_01_Origines_Extra.cbz', 'Spawn', 1, 'Origines Extra'],
+
+            'number glued to dash, release tags' => ['Swing -01(Best of Fusion Comics 03.2019)@9-art-BD.cbr', 'Swing', 1, null],
+            'number glued to dash' => ['Swing -02.cbz', 'Swing', 2, null],
+            'number glued to dash with title' => ['Swing -03 - Un titre.cbz', 'Swing', 3, 'Un titre'],
+            'year in parentheses' => ['Astérix #39 (2021).cbz', 'Astérix', 39, null],
+            'square brackets' => ['Spawn 1 [HQ] Origines.cbz', 'Spawn', 1, 'Origines'],
         ];
     }
 

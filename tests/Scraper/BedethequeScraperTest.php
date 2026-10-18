@@ -135,6 +135,34 @@ HTML;
         $this->assertSame('La profession de Pourpre-Sang n\'est pas de tout repos.', $info->summary);
     }
 
+    public function testSearchTakesCoversFromAlbumPages(): void
+    {
+        $ajaxJson = '[{"id":"14","label":"Largo Winch","value":"Largo Winch","desc":"skin\/flags\/France.png"}]';
+        $seriesPageHtml = <<<HTML
+<html><body>
+<ul class="bdt-box-albums-liste">
+    <li><a href="https://www.bedetheque.com/BD-Largo-Winch-Tome-1-L-heritier-212.html"><span class="bdt-box-albums-titre">L'héritier</span></a></li>
+    <li><a href="https://www.bedetheque.com/BD-Largo-Winch-Tome-2-Le-Groupe-W-213.html"><span class="bdt-box-albums-titre">Le Groupe W</span></a></li>
+</ul>
+</body></html>
+HTML;
+        $albumPageHtml = '<html><body><img itemprop="image" src="/media/Couvertures/Couv_212.jpg"></body></html>';
+
+        // Third response (second album page) is missing: that album keeps its result without a cover.
+        $client = new MockHttpClient([
+            new MockResponse($ajaxJson, ['http_code' => 200]),
+            new MockResponse($seriesPageHtml, ['http_code' => 200]),
+            new MockResponse($albumPageHtml, ['http_code' => 200]),
+        ]);
+
+        $results = (new BedethequeScraper($client))->search('Largo Winch');
+
+        $this->assertCount(2, $results);
+        $this->assertSame('https://www.bedetheque.com/media/Couvertures/Couv_212.jpg', $results[0]->coverUrl);
+        $this->assertNull($results[1]->coverUrl);
+        $this->assertSame('Largo Winch #1 - L\'héritier', $results[0]->title);
+    }
+
     public function testSearchWithTrailingNumberRetriesStrippedQuery(): void
     {
         // First call (with "4") returns empty, second call (stripped) returns results

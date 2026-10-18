@@ -11,6 +11,7 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 class BedethequeScraper implements ScraperInterface
 {
     private const BASE_URL = 'https://www.bedetheque.com';
+    private const COVER_LOOKUP_LIMIT = 10;
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
@@ -47,7 +48,7 @@ class BedethequeScraper implements ScraperInterface
             $response = $this->httpClient->request('GET', self::BASE_URL.'/serie/index/s/'.$seriesId);
             $html = $response->getContent();
 
-            return $this->parseSeriesAlbums($html, $seriesName);
+            return $this->withCovers($this->parseSeriesAlbums($html, $seriesName));
         } catch (TransportExceptionInterface|HttpExceptionInterface $e) {
             return [];
         }
@@ -139,6 +140,60 @@ class BedethequeScraper implements ScraperInterface
         $nodes = null !== $context ? $xpath->query($expression, $context) : $xpath->query($expression);
 
         return false === $nodes ? null : $nodes->item(0);
+    }
+
+    /**
+     * The album list has no images, but each album page has its cover. The first results are
+     * fetched in parallel (Symfony HttpClient sends the requests before their contents are read);
+     * a page that fails keeps its result without a cover.
+     *
+     * @param ScrapeResult[] $results
+     *
+     * @return ScrapeResult[]
+     */
+    private function withCovers(array $results): array
+    {
+        $pending = [];
+        foreach (\array_slice($results, 0, self::COVER_LOOKUP_LIMIT, true) as $i => $result) {
+            try {
+                $pending[$i] = $this->httpClient->request('GET', $result->pageUrl ?? $result->identifier);
+            } catch (TransportExceptionInterface|HttpExceptionInterface) {
+                continue;
+            }
+        }
+
+        foreach ($pending as $i => $response) {
+            try {
+                $cover = $this->coverFromAlbumPage($response->getContent());
+            } catch (TransportExceptionInterface|HttpExceptionInterface) {
+                continue;
+            }
+
+            $result = $results[$i];
+            $results[$i] = new ScrapeResult(
+                identifier: $result->identifier,
+                title: $result->title,
+                subtitle: $result->subtitle,
+                year: $result->year,
+                publisher: $result->publisher,
+                coverUrl: $cover,
+                pageUrl: $result->pageUrl,
+            );
+        }
+
+        return $results;
+    }
+
+    private function coverFromAlbumPage(string $html): ?string
+    {
+        $doc = new \DOMDocument();
+        @$doc->loadHTML('<?xml encoding="UTF-8">'.$html);
+        $src = self::firstNode(new \DOMXPath($doc), '//img[@itemprop="image"]/@src')?->nodeValue;
+        if (null === $src || '' === $src) {
+            return null;
+        }
+
+        return str_starts_with($src, 'http') ? $src : self::BASE_URL.$src;
     }
 
     /** The album list of a series page. The site renamed it from liste-albums to bdt-box-albums-liste. */
