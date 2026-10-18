@@ -1281,4 +1281,21 @@ details.metadata-section[open] > summary::after { transform: rotate(-135deg); }
 }
 
 .skip-form { margin-top: 0.75rem; text-align: center; }
-.logout-link { color: var(--text-3); }
+.logout-form { display: flex; align-items: stretch; margin: 0; }
+
+/* A button styled like the navigation links next to it */
+.logout-link {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 0.75rem;
+    margin-bottom: -1px;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font: inherit;
+    font-weight: 500;
+    color: var(--text-3);
+    cursor: pointer;
+}
+
+.logout-link:hover { color: var(--text); }
