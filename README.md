@@ -55,7 +55,7 @@ The container runs as `www-data`, with its UID and GID aligned on your host user
 git clone https://github.com/chevalierbenoit/cbzforge.git
 cd cbzforge
 composer install
-cp .env .env.local           # then set APP_SECRET, see "Security" below
+cp .env .env.local           # optional: see "Security" below for APP_SECRET
 php bin/console doctrine:database:create
 php bin/console doctrine:migrations:migrate
 symfony serve                # or: php -S 127.0.0.1:8000 -t public
@@ -126,7 +126,7 @@ The OpenAPI documentation is served at `/api/docs`. The full route list is avail
 
 | Variable | Description |
 |----------|-------------|
-| `APP_SECRET` | Application secret. Required. |
+| `APP_SECRET` | Application secret. Generated on first start if unset. |
 | `DATABASE_URL` | Database URL. Defaults to SQLite in `var/data.db`. |
 | `MESSENGER_TRANSPORT_DSN` | Queue transport. Defaults to the Doctrine transport. |
 
@@ -135,12 +135,7 @@ The OpenAPI documentation is served at `/api/docs`. The full route list is avail
 - **Sign-in required.** Every page and API route needs the administrator's account; the sign-in page is rate limited (5 attempts, then a 15 minute wait). There is no default password.
 - **Single account.** Version 1 has one administrator and no API key. Multiple users and an API key are not implemented.
 - **Requests are checked.** Every request that changes data needs the session's CSRF token (a hidden `_token` field in forms, the `X-CSRF-Token` header for scripts) and must not come from another site (`Origin` check). Session cookies are `SameSite=Lax` as a second layer. Behind a reverse proxy, the host and scheme seen by the app must match the browser's (configure trusted proxies).
-- **Set your own `APP_SECRET`.** The value in `.env` is a placeholder. Put a real secret in `.env.local`, which is git-ignored:
-
-  ```bash
-  echo "APP_SECRET=$(openssl rand -hex 32)" >> .env.local
-  ```
-
+- **The application secret is generated for you.** On first start the container creates a random `APP_SECRET`, stored in the data volume (`var/app_secret`), and reuses it afterwards. To choose your own value, set `APP_SECRET` in the environment; the example value from `.env` is refused.
 - **Paths are restricted.** Files are only read and written inside the libraries you configured. Rename destinations must stay inside the library the file belongs to.
 
 ## Development
