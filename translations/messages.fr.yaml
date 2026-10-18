@@ -37,7 +37,7 @@ admin.conversion: Conversion
 admin.task_queue: File d'attente
 admin.name_placeholder: 'Nom (ex: Manga)'
 admin.path_placeholder: 'Chemin (ex: /mnt/Livre/Manga)'
-admin.add: '+ Ajouter'
+admin.add: Ajouter
 admin.edit: Modifier
 admin.delete: Supprimer
 admin.confirm_delete: Supprimer cette bibliothèque ?

@@ -37,7 +37,7 @@ admin.conversion: Conversion
 admin.task_queue: Task queue
 admin.name_placeholder: 'Name (e.g. Manga)'
 admin.path_placeholder: 'Path (e.g. /mnt/Books/Manga)'
-admin.add: '+ Add'
+admin.add: Add
 admin.edit: Edit
 admin.delete: Delete
 admin.confirm_delete: Delete this library?
