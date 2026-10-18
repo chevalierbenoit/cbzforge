@@ -195,7 +195,7 @@ class AdminControllerTest extends WebTestCase
         rmdir($tmpDirB);
     }
 
-    public function testSettingsPostWithoutDummy(): void
+    public function testSettingsPostWithoutFake(): void
     {
         $client = static::createClient();
         $client->request('POST', '/admin/settings', []);
@@ -250,7 +250,7 @@ class AdminControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request('POST', '/admin/settings', [
-            'scraper_enabled_Dummy' => '1',
+            'scraper_enabled_Fake' => '1',
         ]);
 
         $this->assertResponseRedirects('/admin/settings');
@@ -262,7 +262,7 @@ class AdminControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request('POST', '/admin/settings', [
-            'scraper_enabled_Dummy' => '0',
+            'scraper_enabled_Fake' => '0',
         ]);
 
         $this->assertResponseRedirects('/admin/settings');
@@ -274,7 +274,7 @@ class AdminControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request('POST', '/admin/settings', [
-            'scraper_enabled_Dummy' => '1',
+            'scraper_enabled_Fake' => '1',
             'google_books_api_key' => 'test-key',
         ]);
 
