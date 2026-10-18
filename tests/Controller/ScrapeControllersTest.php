@@ -11,6 +11,8 @@ use Symfony\Component\HttpClient\MockHttpClient;
 
 class ScrapeControllersTest extends WebTestCase
 {
+    use AdminClientTrait;
+
     public function testReadMetadataReturnsNullForNoMetadata(): void
     {
         $tmpDir = sys_get_temp_dir().'/scrape-'.uniqid();
@@ -21,7 +23,7 @@ class ScrapeControllersTest extends WebTestCase
         $zip->addFromString('page01.jpg', 'image-data');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -56,7 +58,7 @@ class ScrapeControllersTest extends WebTestCase
         $zip->addFromString('ComicInfo.xml', $xml);
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -90,7 +92,7 @@ class ScrapeControllersTest extends WebTestCase
         $zip->addFromString('page01.jpg', 'image-data');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -161,7 +163,7 @@ class ScrapeControllersTest extends WebTestCase
         $zip->addFromString('ComicInfo.xml', '<?xml version="1.0"?><ComicInfo><Series>Test</Series></ComicInfo>');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -186,7 +188,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testLibraryNotFound(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/scrape/read', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
@@ -209,7 +211,7 @@ class ScrapeControllersTest extends WebTestCase
         $zip->addFromString('page01.jpg', 'fake-image-binary');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -224,7 +226,10 @@ class ScrapeControllersTest extends WebTestCase
 
         $this->assertResponseIsSuccessful();
         $this->assertResponseHeaderSame('Content-Type', 'image/jpeg');
-        $this->assertResponseHeaderSame('Cache-Control', 'max-age=3600, private');
+        // Symfony orders the directives itself once a session is involved; the content is what matters.
+        $cacheControl = (string) $client->getResponse()->headers->get('Cache-Control');
+        $this->assertStringContainsString('max-age=3600', $cacheControl);
+        $this->assertStringContainsString('private', $cacheControl);
 
         unlink($cbzPath);
         rmdir($tmpDir);
@@ -232,7 +237,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testCoverEndpointReturnsSvgForMissingLibrary(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('GET', '/api/files/cover', [
             'library_id' => 99999,
             'path' => 'test.cbz',
@@ -243,7 +248,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testCoverEndpointMissingParams(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('GET', '/api/files/cover');
 
         $this->assertResponseStatusCodeSame(404);
@@ -251,7 +256,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testScrapeUrlNoScraperFound(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/scrape/url', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
@@ -265,7 +270,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testScrapeUrlWithFakeScraper(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/scrape/url', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
@@ -281,7 +286,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testScrapeUrlWithScraperDisabled(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
 
         $setting = new Setting();
@@ -303,7 +308,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testSearchWithQuery(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/scrape/search', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
@@ -319,7 +324,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testSearchWithUnknownScraper(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/scrape/search', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
@@ -334,7 +339,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testSearchWithDisabledScraper(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
 
         $setting = new Setting();
@@ -365,7 +370,7 @@ class ScrapeControllersTest extends WebTestCase
         $zip->addFromString('page01.jpg', 'image-data');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -394,7 +399,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testConfirmIdentifierLibraryNotFound(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/scrape/confirm', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
@@ -419,7 +424,7 @@ class ScrapeControllersTest extends WebTestCase
         $zip->addFromString('page01.jpg', 'image-data');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -452,7 +457,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testConfirmIdentifierScraperNotFound(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/scrape/confirm', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
@@ -469,7 +474,7 @@ class ScrapeControllersTest extends WebTestCase
 
     public function testConfirmBatchStoresPayload(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -508,7 +513,7 @@ class ScrapeControllersTest extends WebTestCase
         $zip->addFromString('readme.txt', 'not an image');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -537,7 +542,7 @@ class ScrapeControllersTest extends WebTestCase
         $cbzPath = $tmpDir.'/test.cbz';
         file_put_contents($cbzPath, 'this is not a valid zip archive');
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -566,7 +571,7 @@ class ScrapeControllersTest extends WebTestCase
         $cbzPath = $tmpDir.'/test.cbz';
         touch($cbzPath);
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $container = $client->getContainer();
 
         $mockClient = new MockHttpClient(static function () {
@@ -606,7 +611,7 @@ class ScrapeControllersTest extends WebTestCase
         $cbrPath = $tmpDir.'/test.cbr';
         file_put_contents($cbrPath, 'fake rar content');
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');

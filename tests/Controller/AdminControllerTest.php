@@ -7,9 +7,11 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class AdminControllerTest extends WebTestCase
 {
+    use AdminClientTrait;
+
     public function testIndexListsLibraries(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $crawler = $client->request('GET', '/admin/libraries');
 
         $this->assertResponseIsSuccessful();
@@ -18,7 +20,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testAddLibraryWithInvalidPath(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $crawler = $client->request('POST', '/admin/libraries/add', [
             'name' => 'Test',
             'path' => '/nonexistent/path',
@@ -34,7 +36,7 @@ class AdminControllerTest extends WebTestCase
         $tmpDir = sys_get_temp_dir().'/admin-test-'.uniqid();
         mkdir($tmpDir, 0777, true);
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $crawler = $client->request('POST', '/admin/libraries/add', [
             'name' => 'Ma Bibliothèque',
             'path' => $tmpDir,
@@ -53,7 +55,7 @@ class AdminControllerTest extends WebTestCase
         $tmpDir = sys_get_temp_dir().'/admin-dup-'.uniqid();
         mkdir($tmpDir, 0777, true);
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Existing');
@@ -75,7 +77,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testEditLibraryGet(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Edit Me');
@@ -91,7 +93,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testEditLibraryPost(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Old Name');
@@ -111,7 +113,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testEditLibraryInvalidPath(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -129,7 +131,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testEditLibraryNotFound(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('GET', '/admin/libraries/99999/edit');
 
         $this->assertResponseStatusCodeSame(404);
@@ -137,7 +139,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testDeleteLibrary(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Delete Me');
@@ -154,7 +156,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testDeleteNonexistentLibrary(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/admin/libraries/99999/delete');
 
         $this->assertResponseRedirects('/admin/libraries');
@@ -167,7 +169,7 @@ class AdminControllerTest extends WebTestCase
         mkdir($tmpDirA, 0777, true);
         mkdir($tmpDirB, 0777, true);
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
 
         $libraryA = new Library();
@@ -197,7 +199,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testSettingsPostWithoutFake(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/admin/settings', []);
 
         $this->assertResponseRedirects('/admin/settings');
@@ -207,7 +209,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testSettingsGet(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $crawler = $client->request('GET', '/admin/settings');
 
         $this->assertResponseIsSuccessful();
@@ -231,7 +233,7 @@ class AdminControllerTest extends WebTestCase
             '/admin/tasks',
         ];
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
 
         foreach ($paths as $path) {
             $crawler = $client->request('GET', $path);
@@ -248,7 +250,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testSettingsPost(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/admin/settings', [
             'scraper_enabled_Fake' => '1',
         ]);
@@ -260,7 +262,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testSettingsPostWithDisabled(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/admin/settings', [
             'scraper_enabled_Fake' => '0',
         ]);
@@ -272,7 +274,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testSettingsPageDisablesUnconfiguredScraper(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $crawler = $client->request('GET', '/admin/settings');
 
         $this->assertResponseIsSuccessful();
@@ -283,7 +285,7 @@ class AdminControllerTest extends WebTestCase
 
     public function testSettingsPostWithConfigField(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/admin/settings', [
             'scraper_enabled_Fake' => '1',
             'google_books_api_key' => 'test-key',

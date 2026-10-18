@@ -7,9 +7,11 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class RenameControllerTest extends WebTestCase
 {
+    use AdminClientTrait;
+
     public function testPreviewRequiresLibraryId(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/rename/preview', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode(['path' => 'test.cbz']));
@@ -21,7 +23,7 @@ class RenameControllerTest extends WebTestCase
 
     public function testPreviewLibraryNotFound(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/rename/preview', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode(['library_id' => 99999, 'path' => 'test.cbz']));
@@ -41,7 +43,7 @@ class RenameControllerTest extends WebTestCase
         $zip->addFromString('page01.jpg', 'data');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -66,7 +68,7 @@ class RenameControllerTest extends WebTestCase
 
     public function testExecuteRequiresLibraryId(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/rename/execute', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode(['path' => 'test.cbz']));
@@ -78,7 +80,7 @@ class RenameControllerTest extends WebTestCase
 
     public function testExecuteLibraryNotFound(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/rename/execute', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode(['library_id' => 99999, 'path' => 'test.cbz']));
@@ -98,7 +100,7 @@ class RenameControllerTest extends WebTestCase
         $zip->addFromString('page01.jpg', 'data');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -132,7 +134,7 @@ class RenameControllerTest extends WebTestCase
         $zip->addFromString('ComicInfo.xml', '<?xml version="1.0"?><ComicInfo><Series>Spawn</Series><Number>1</Number></ComicInfo>');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -165,7 +167,7 @@ class RenameControllerTest extends WebTestCase
         $zip->addFromString('ComicInfo.xml', '<?xml version="1.0"?><ComicInfo><Series>Spawn</Series><Number>1</Number></ComicInfo>');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -199,7 +201,7 @@ class RenameControllerTest extends WebTestCase
         $zip->addFromString('ComicInfo.xml', '<?xml version="1.0"?><ComicInfo><Series>Spawn</Series><Number>1</Number></ComicInfo>');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -233,7 +235,7 @@ class RenameControllerTest extends WebTestCase
         $zip->addFromString('ComicInfo.xml', '<?xml version="1.0"?><ComicInfo><Series>Spawn</Series><Number>1</Number></ComicInfo>');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -271,7 +273,7 @@ class RenameControllerTest extends WebTestCase
         $zip->addFromString('ComicInfo.xml', '<?xml version="1.0"?><ComicInfo><Series>Spawn</Series><Number>1</Number></ComicInfo>');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -312,7 +314,7 @@ class RenameControllerTest extends WebTestCase
         $zip->addFromString('ComicInfo.xml', '<?xml version="1.0"?><ComicInfo><Series>Spawn</Series><Number>1</Number></ComicInfo>');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -352,7 +354,7 @@ class RenameControllerTest extends WebTestCase
 
         touch($tmpDir.'/blocking-file');
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -392,7 +394,7 @@ class RenameControllerTest extends WebTestCase
 
         touch($tmpDir.'/Spawn');
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -427,7 +429,7 @@ class RenameControllerTest extends WebTestCase
         $zip->addFromString('ComicInfo.xml', '<?xml version="1.0"?><ComicInfo><Series>Spawn</Series><Number>1</Number><Title>La Naissance</Title></ComicInfo>');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -462,7 +464,7 @@ class RenameControllerTest extends WebTestCase
         $zip->addFromString('ComicInfo.xml', '<?xml version="1.0"?><ComicInfo><Series>Spawn</Series><Number>1</Number><Title>La Naissance</Title></ComicInfo>');
         $zip->close();
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');

@@ -1254,3 +1254,31 @@ details.metadata-section[open] > summary::after { transform: rotate(-135deg); }
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }
+
+/* ---------- Sign-in, setup and onboarding ---------- */
+
+.auth-page {
+    min-height: calc(100vh - var(--header-h));
+    display: grid;
+    place-items: center;
+    padding: 2rem 1rem;
+}
+
+.auth-card { width: min(420px, 100%); }
+.auth-card .card-body { display: grid; gap: 0.25rem; }
+.auth-card .form-group { margin-bottom: 0.75rem; }
+.auth-card input[type="text"], .auth-card input[type="password"] { width: 100%; }
+
+.page-narrow { max-width: 640px; }
+
+.step-indicator {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text-3);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+}
+
+.skip-form { margin-top: 0.75rem; text-align: center; }
+.logout-link { color: var(--text-3); }

@@ -7,9 +7,11 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class FileRenameControllerFunctionalTest extends WebTestCase
 {
+    use AdminClientTrait;
+
     public function testRenameFileLibraryNotFound(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/rename-file', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
@@ -30,7 +32,7 @@ class FileRenameControllerFunctionalTest extends WebTestCase
         touch($tmpDir.'/file.cbz');
         touch($tmpDir.'/existing.cbz');
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');

@@ -30,6 +30,7 @@
             <span class="brand-text">cbzforge</span>
         </a>
 
+        {% if app.user %}
         <nav class="app-nav" aria-label="{{ 'nav.main'|trans }}">
             <a href="{{ path('dashboard') }}" class="nav-link{{ app.current_route == 'dashboard' or library_section ? ' is-active' : '' }}"
                {{ app.current_route == 'dashboard' or library_section ? 'aria-current="page"' : '' }}>
@@ -40,6 +41,7 @@
                 <span>{{ 'nav.administration'|trans }}</span>
             </a>
         </nav>
+        {% endif %}
 
         <div class="header-spacer"></div>
 
@@ -49,6 +51,7 @@
             <span class="theme-icon theme-icon-sun">{{ ui.icon('sun') }}</span>
         </button>
 
+        {% if app.user %}
         <div class="queue" data-controller="status-bar"
              data-status-bar-locale-value="{{ app.request.locale }}"
              data-action="mouseenter->status-bar#showPanel mouseleave->status-bar#hidePanelWithDelay">
@@ -67,6 +70,8 @@
                 <div class="status-bar-panel-body" data-status-bar-target="body"></div>
             </div>
         </div>
+        <a href="{{ path('app_logout') }}" class="nav-link logout-link">{{ 'nav.logout'|trans }}</a>
+        {% endif %}
     </header>
 
     {% if admin_section %}
