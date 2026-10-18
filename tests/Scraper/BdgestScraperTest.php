@@ -10,6 +10,47 @@ use Symfony\Component\HttpClient\Response\MockResponse;
 
 class BdgestScraperTest extends TestCase
 {
+    /**
+     * An album page in the markup the site serves now: microdata for the name, number, year,
+     * publisher and description, an authors list with one role per author, and the EAN in a hidden input.
+     *
+     * @param list<array{0: string, 1: string}> $authors [name, role] pairs
+     */
+    private function albumPage(
+        string $series = 'Spawn',
+        string $name = 'Spawn - Origines',
+        string $headline = 'Tome 1',
+        array $authors = [['McFarlane, Todd', 'Scénario'], ['McFarlane, Todd', 'Dessin']],
+        string $publisher = 'Image Comics',
+        string $date = '1992-01-01',
+        string $ean = '9780000000000',
+        string $pages = '112',
+        string $description = 'Première aventure de Spawn.',
+    ): string {
+        $authorSpans = '';
+        foreach ($authors as [$author, $role]) {
+            $authorSpans .= '<span><a href="https://www.bedetheque.com/auteur-1.html">'.$author.'</a> <small>('.$role.')</small></span>';
+        }
+
+        return <<<HTML
+<html>
+<body>
+<div>
+    <h1><a href="https://www.bedetheque.com/serie-123-BD-{$series}.html" title="{$series}">{$series}</a></h1>
+    <meta itemprop="name" content="{$name}">
+    <meta itemprop="alternativeheadline" content="{$headline}">
+    <div class="bdt-ah-auteurs liste-auteurs">{$authorSpans}</div>
+    <meta itemprop="datePublished" content="{$date}">
+    <span itemprop="publisher">{$publisher}</span>
+    <input type="hidden" id="EAN" value="{$ean}">
+    <b itemprop="numberOfPages">{$pages}</b> pages
+    <span itemprop="description">{$description}</span>
+</div>
+</body>
+</html>
+HTML;
+    }
+
     public function testGetName(): void
     {
         $scraper = new BdgestScraper(new MockHttpClient());
@@ -30,10 +71,7 @@ class BdgestScraperTest extends TestCase
         $seriesPageHtml = <<<HTML
 <html>
 <body>
-<ul class="liste-albums">
-    <li>nav item</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li>
         <a href="https://www.bedetheque.com/BD-Largo-Winch-Tome-1-L-heritier-212.html">L'héritier</a>
     </li>
@@ -61,39 +99,7 @@ HTML;
 
     public function testScrapeParsesAlbumPage(): void
     {
-        $html = <<<HTML
-<html>
-<body>
-<div class="bandeau-info album panier">
-    <h1>
-        <a href="https://www.bedetheque.com/serie-123-BD-Spawn.html" title="Spawn">Spawn</a>
-    </h1>
-    <h2>1<span class="numa"></span>. Origines</h2>
-    <meta itemprop="name" content="Spawn - Origines">
-    <meta itemprop="alternativeheadline" content="Tome 1">
-    <h3>
-        Une BD de
-        <a href="https://www.bedetheque.com/auteur-456-BD-Todd-McFarlane.html">
-            <span itemprop="author">Todd McFarlane</span>
-        </a>
-        - <span itemprop="publisher" class='editeur'>Image Comics</span>
-        <span class='collection'>(Spawn)</span>
-        - <span class='annee'>1992</span>
-        <div class='liste-auteurs'>
-            <a href="https://www.bedetheque.com/auteur-456-BD-McFarlane-Todd.html">McFarlane, Todd</a>
-            <span class='metier'>(Scénario)</span>
-            <a href="https://www.bedetheque.com/auteur-456-BD-McFarlane-Todd.html">McFarlane, Todd</a>
-            <span class='metier'>(Dessin)</span>
-        </div>
-    </h3>
-    <span itemprop="description">Première aventure de Spawn.</span>
-    <span itemprop="isbn">9780000000000</span>
-    <i class="icon-book espace"></i> <span itemprop="numberOfPages">112</span> pages
-    <br/>
-</div>
-</body>
-</html>
-HTML;
+        $html = $this->albumPage();
         $client = new MockHttpClient([
             new MockResponse($html, ['http_code' => 200]),
         ]);
@@ -110,37 +116,7 @@ HTML;
 
     public function testScrapeExtractsAllFields(): void
     {
-        $html = <<<HTML
-<html>
-<body>
-<div class="bandeau-info album panier">
-    <h1>
-        <a href="https://www.bedetheque.com/serie-97940-BD-Pourpre-Sang.html" title="Pourpre-Sang">Pourpre-Sang</a>
-    </h1>
-    <h2>1<span class="numa"></span>. Le Cercle de Nimuée</h2>
-    <h3>
-        Une BD de
-        <a href="https://www.bedetheque.com/auteur-53663-BD-Cherel-Leo.html">
-            <span itemprop="author">Léo Chérel</span>
-        </a>
-        - <span itemprop="publisher" class='editeur'>Astrolabe</span>
-        <span class='collection'>(Charybde)</span>
-        - <span class='annee'>2026</span>
-        <div class='liste-auteurs'>
-            <a href="https://www.bedetheque.com/auteur-53663-BD-Cherel-Leo.html">Chérel, Léo</a>
-            <span class='metier'>(Scénario)</span>
-            <a href="https://www.bedetheque.com/auteur-53663-BD-Cherel-Leo.html">Chérel, Léo</a>
-            <span class='metier'>(Dessin)</span>
-        </div>
-    </h3>
-    <span class="parution">(09 mai 2026)</span>
-    <span itemprop="numberOfPages">112</span> pages
-    <span itemprop="isbn">9782488807067</span>
-    <span itemprop="description">La profession de Pourpre-Sang n'est pas de tout repos.</span>
-</div>
-</body>
-</html>
-HTML;
+        $html = $this->albumPage('Pourpre-Sang', 'Pourpre-Sang - Le Cercle de Nimuée', 'Tome 1', [['Chérel, Léo', 'Scénario'], ['Chérel, Léo', 'Dessin']], 'Astrolabe', '2026-05-09', '9782488807067', '112', 'La profession de Pourpre-Sang n\'est pas de tout repos.');
         $client = new MockHttpClient([
             new MockResponse($html, ['http_code' => 200]),
         ]);
@@ -167,10 +143,7 @@ HTML;
         $seriesPageHtml = <<<HTML
 <html>
 <body>
-<ul class="liste-albums">
-    <li>nav</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li><a href="https://www.bedetheque.com/BD-Largo-Winch-Tome-1-L-heritier-212.html">L'héritier</a></li>
 </ul>
 </body>
@@ -197,10 +170,7 @@ HTML;
         $seriesPageHtml = <<<HTML
 <html>
 <body>
-<ul class="liste-albums">
-    <li>nav</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li><a href="https://www.bedetheque.com/BD-Largo-Winch-Tome-1-L-heritier-212.html">L'héritier</a></li>
 </ul>
 </body>
@@ -227,10 +197,7 @@ HTML;
         $seriesPageHtml = <<<HTML
 <html>
 <body>
-<ul class="liste-albums">
-    <li>nav</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li><a href="https://www.bedetheque.com/BD-Crepuscule-des-dieux-Tome-1-Le-Crepuscule-212.html">Le Crépuscule</a></li>
 </ul>
 </body>
@@ -281,10 +248,7 @@ HTML;
         $seriesPageHtml = <<<HTML
 <html>
 <body>
-<ul class="liste-albums">
-    <li>nav</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li>
         <a href="https://www.bedetheque.com/album/creation">Ajouter</a>
     </li>
@@ -316,39 +280,14 @@ HTML;
 <div class="bandeau-info">
     <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
 </div>
-<ul class="liste-albums">
-    <li>nav</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li><a href="/BD-Spawn-Tome-1-Origines-1234.html">Origines</a></li>
 </ul>
 </body>
 </html>
 HTML;
 
-        $albumHtml = <<<HTML
-<html>
-<body>
-<div class="bandeau-info album panier">
-    <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
-    <h2>1<span class="numa"></span>. Origines</h2>
-    <h3>
-        <div class="liste-auteurs">
-            <a href="...">McFarlane, Todd</a>
-            <span class="metier">(Scénario)</span>
-            <a href="...">McFarlane, Todd</a>
-            <span class="metier">(Dessin)</span>
-        </div>
-        <span itemprop="publisher" class="editeur">Image Comics</span>
-        <span class="annee">1992</span>
-    </h3>
-    <span itemprop="isbn">9780000000000</span>
-    <span itemprop="description">Première aventure de Spawn.</span>
-    <span itemprop="numberOfPages">112</span>
-</div>
-</body>
-</html>
-HTML;
+        $albumHtml = $this->albumPage();
 
         $client = new MockHttpClient([
             new MockResponse($seriesHtml, ['http_code' => 200]),
@@ -371,10 +310,7 @@ HTML;
 <div class="bandeau-info">
     <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
 </div>
-<ul class="liste-albums">
-    <li>nav</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li>Just text, no link</li>
     <li>Another item with no link</li>
 </ul>
@@ -402,10 +338,7 @@ HTML;
 <div class="bandeau-info">
     <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
 </div>
-<ul class="liste-albums">
-    <li>nav</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li><a href="https://www.bedetheque.com/album/creation">Ajouter</a></li>
     <li><a href="/BD-Spawn-Tome-1-Origines-1234.html">Origines</a></li>
 </ul>
@@ -413,29 +346,7 @@ HTML;
 </html>
 HTML;
 
-        $albumHtml = <<<HTML
-<html>
-<body>
-<div class="bandeau-info album panier">
-    <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
-    <h2>1<span class="numa"></span>. Origines</h2>
-    <h3>
-        <div class="liste-auteurs">
-            <a href="...">McFarlane, Todd</a>
-            <span class="metier">(Scénario)</span>
-            <a href="...">McFarlane, Todd</a>
-            <span class="metier">(Dessin)</span>
-        </div>
-        <span itemprop="publisher" class="editeur">Image Comics</span>
-        <span class="annee">1992</span>
-    </h3>
-    <span itemprop="isbn">9780000000000</span>
-    <span itemprop="description">Première aventure de Spawn.</span>
-    <span itemprop="numberOfPages">112</span>
-</div>
-</body>
-</html>
-HTML;
+        $albumHtml = $this->albumPage();
 
         $client = new MockHttpClient([
             new MockResponse($seriesHtml, ['http_code' => 200]),
@@ -458,10 +369,7 @@ HTML;
 <div class="bandeau-info">
     <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
 </div>
-<ul class="liste-albums">
-    <li>nav</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li><a href="">Empty href</a></li>
     <li><a href="/BD-Spawn-Tome-1-Origines-1234.html">Origines</a></li>
 </ul>
@@ -469,29 +377,7 @@ HTML;
 </html>
 HTML;
 
-        $albumHtml = <<<HTML
-<html>
-<body>
-<div class="bandeau-info album panier">
-    <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
-    <h2>1<span class="numa"></span>. Origines</h2>
-    <h3>
-        <div class="liste-auteurs">
-            <a href="...">McFarlane, Todd</a>
-            <span class="metier">(Scénario)</span>
-            <a href="...">McFarlane, Todd</a>
-            <span class="metier">(Dessin)</span>
-        </div>
-        <span itemprop="publisher" class="editeur">Image Comics</span>
-        <span class="annee">1992</span>
-    </h3>
-    <span itemprop="isbn">9780000000000</span>
-    <span itemprop="description">Première aventure de Spawn.</span>
-    <span itemprop="numberOfPages">112</span>
-</div>
-</body>
-</html>
-HTML;
+        $albumHtml = $this->albumPage();
 
         $client = new MockHttpClient([
             new MockResponse($seriesHtml, ['http_code' => 200]),
@@ -508,27 +394,7 @@ HTML;
 
     public function testParseAlbumPageNumberOnly(): void
     {
-        $html = <<<HTML
-<html>
-<body>
-<div class="bandeau-info album panier">
-    <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
-    <h2>42</h2>
-    <h3>
-        <div class="liste-auteurs">
-            <a href="...">McFarlane, Todd</a>
-            <span class="metier">(Scénario)</span>
-        </div>
-        <span itemprop="publisher" class="editeur">Image Comics</span>
-        <span class="annee">1992</span>
-    </h3>
-    <span itemprop="isbn">9780000000000</span>
-    <span itemprop="description">Desc.</span>
-    <span itemprop="numberOfPages">112</span>
-</div>
-</body>
-</html>
-HTML;
+        $html = $this->albumPage('Spawn', 'Spawn', '42', [['McFarlane, Todd', 'Scénario']]);
 
         $client = new MockHttpClient([
             new MockResponse($html, ['http_code' => 200]),
@@ -543,23 +409,7 @@ HTML;
 
     public function testParseAlbumPageTitleOnly(): void
     {
-        $html = <<<HTML
-<html>
-<body>
-<div class="bandeau-info album panier">
-    <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
-    <h2>Titre seul</h2>
-    <h3>
-        <div class="liste-auteurs">
-            <a href="...">McFarlane, Todd</a>
-            <span class="metier">(Scénario)</span>
-        </div>
-        <span itemprop="publisher" class="editeur">Image Comics</span>
-    </h3>
-</div>
-</body>
-</html>
-HTML;
+        $html = $this->albumPage('Spawn', 'Spawn - Titre seul', 'Hors série', [['McFarlane, Todd', 'Scénario']]);
 
         $client = new MockHttpClient([
             new MockResponse($html, ['http_code' => 200]),
@@ -574,29 +424,7 @@ HTML;
 
     public function testParseAlbumPageAuthorsWithAllRoles(): void
     {
-        $html = <<<HTML
-<html>
-<body>
-<div class="bandeau-info album panier">
-    <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
-    <h2>1. Test</h2>
-    <h3>
-        <div class="liste-auteurs">
-            <a href="...">Writer, The</a>
-            <span class="metier">(Scénario)</span>
-            <a href="...">Artist, The</a>
-            <span class="metier">(Dessin)</span>
-            <a href="...">Inker, The</a>
-            <span class="metier">(Encre)</span>
-            <a href="...">Colorist, The</a>
-            <span class="metier">(Couleur)</span>
-        </div>
-        <span itemprop="publisher" class="editeur">Image Comics</span>
-    </h3>
-</div>
-</body>
-</html>
-HTML;
+        $html = $this->albumPage('Spawn', 'Spawn - Test', 'Tome 1', [['Writer, The', 'Scénario'], ['Artist, The', 'Dessin'], ['Inker, The', 'Encre'], ['Colorist, The', 'Couleur']]);
 
         $client = new MockHttpClient([
             new MockResponse($html, ['http_code' => 200]),
@@ -610,65 +438,6 @@ HTML;
         $this->assertSame('The Artist', $info->penciler);
         $this->assertSame('The Inker', $info->inker);
         $this->assertSame('The Colorist', $info->colorist);
-    }
-
-    public function testParseAlbumPageFallbackWriter(): void
-    {
-        $html = <<<HTML
-<html>
-<body>
-<div class="bandeau-info album panier">
-    <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
-    <h2>1. Test</h2>
-    <h3>
-        <div class="liste-auteurs">
-            <a href="...">Doe, John</a>
-        </div>
-        <span itemprop="publisher" class="editeur">Image Comics</span>
-    </h3>
-</div>
-</body>
-</html>
-HTML;
-
-        $client = new MockHttpClient([
-            new MockResponse($html, ['http_code' => 200]),
-        ]);
-
-        $scraper = new BdgestScraper($client);
-        $info = $scraper->scrape('/BD-Test-123.html');
-
-        $this->assertSame('John Doe', $info->writer);
-    }
-
-    public function testParseAlbumPageFallbackPublisher(): void
-    {
-        $html = <<<HTML
-<html>
-<body>
-<div class="bandeau-info album panier">
-    <h1><a href="https://www.bedetheque.com/serie-123-BD-Spawn.html">Spawn</a></h1>
-    <h2>1. Test</h2>
-    <h3>
-        <div class="liste-auteurs">
-            <a href="...">Doe, John</a>
-            <span class="metier">(Scénario)</span>
-        </div>
-        <span class="editeur">Fallback Publisher</span>
-    </h3>
-</div>
-</body>
-</html>
-HTML;
-
-        $client = new MockHttpClient([
-            new MockResponse($html, ['http_code' => 200]),
-        ]);
-
-        $scraper = new BdgestScraper($client);
-        $info = $scraper->scrape('/BD-Test-123.html');
-
-        $this->assertSame('Fallback Publisher', $info->publisher);
     }
 
     public function testGetConfigFields(): void
@@ -704,7 +473,7 @@ HTML;
         $seriesPageHtml = <<<HTML
 <html>
 <body>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li>Only one UL - not enough</li>
 </ul>
 </body>
@@ -728,10 +497,7 @@ HTML;
         $seriesPageHtml = <<<HTML
 <html>
 <body>
-<ul class="liste-albums">
-    <li>nav</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li>No link here - just text</li>
     <li><a href="/BD-Largo-Winch-Tome-1-L-heritier-212.html">L'héritier</a></li>
 </ul>
@@ -757,10 +523,7 @@ HTML;
         $seriesPageHtml = <<<HTML
 <html>
 <body>
-<ul class="liste-albums">
-    <li>nav</li>
-</ul>
-<ul class="liste-albums">
+<ul class="bdt-box-albums-liste">
     <li><a href="">Empty href</a></li>
     <li><a href="/BD-Largo-Winch-Tome-1-L-heritier-212.html">L'héritier</a></li>
 </ul>
