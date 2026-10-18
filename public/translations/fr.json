@@ -133,5 +133,6 @@
     "js.scrape.section_series": "Série et numéro",
     "js.scrape.section_credits": "Crédits",
     "js.scrape.section_edition": "Édition et contenu",
-    "js.scrape.open_page": "Ouvrir la fiche"
+    "js.scrape.open_page": "Ouvrir la fiche",
+    "js.scrape.numbers_ready": "Numéros attribués, enregistrés avec les métadonnées :"
 }

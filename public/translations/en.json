@@ -133,5 +133,6 @@
     "js.scrape.section_series": "Series and issue",
     "js.scrape.section_credits": "Credits",
     "js.scrape.section_edition": "Edition and content",
-    "js.scrape.open_page": "Open page"
+    "js.scrape.open_page": "Open page",
+    "js.scrape.numbers_ready": "Numbers set, saved with the metadata:"
 }
