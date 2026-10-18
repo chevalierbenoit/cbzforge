@@ -134,5 +134,6 @@
     "js.scrape.section_credits": "Credits",
     "js.scrape.section_edition": "Edition and content",
     "js.scrape.open_page": "Open page",
-    "js.scrape.numbers_ready": "Numbers set, saved with the metadata:"
+    "js.scrape.numbers_ready": "Numbers set, saved with the metadata:",
+    "js.convert.confirm": "Convert %count% file(s) to CBZ? Each original file is deleted once its CBZ is created."
 }

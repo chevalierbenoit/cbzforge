@@ -7,9 +7,11 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class ConvertControllerFunctionalTest extends WebTestCase
 {
+    use AdminClientTrait;
+
     public function testConvertEndpointLibraryNotFound(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('POST', '/api/files/convert', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
@@ -30,7 +32,7 @@ class ConvertControllerFunctionalTest extends WebTestCase
         $cbrPath = $tmpDir.'/test.cbr';
         file_put_contents($cbrPath, 'fake-rar-data');
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');

@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 import { Translator } from '../translator.js';
 import { setMetadataBadge, metadataBadge } from '../badges.js';
+import { csrfFetch } from '../csrf.js';
 
 function formField(name, label, value) {
     return `<div class="form-group">
@@ -100,7 +101,7 @@ export default class extends Controller {
     }
 
     async _checkMetadata() {
-        const response = await fetch('/api/files/scrape/read', {
+        const response = await csrfFetch('/api/files/scrape/read', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -160,7 +161,7 @@ export default class extends Controller {
             ? this._searchFiles[this._searchIndex]
             : this._currentPath;
 
-        const response = await fetch('/api/files/scrape/search', {
+        const response = await csrfFetch('/api/files/scrape/search', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -180,7 +181,7 @@ export default class extends Controller {
     }
 
     async _writeMetadata(identifier) {
-        const response = await fetch('/api/files/scrape/confirm', {
+        const response = await csrfFetch('/api/files/scrape/confirm', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -199,7 +200,7 @@ export default class extends Controller {
     }
 
     async _scrapeUrl(identifier) {
-        const response = await fetch('/api/files/scrape/url', {
+        const response = await csrfFetch('/api/files/scrape/url', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -355,7 +356,7 @@ export default class extends Controller {
             item.style.pointerEvents = 'none';
 
             try {
-                const response = await fetch('/api/files/scrape/confirm', {
+                const response = await csrfFetch('/api/files/scrape/confirm', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -456,7 +457,7 @@ export default class extends Controller {
         scrapeBtn.textContent = this.translator.trans('js.scrape.scraping');
 
         try {
-            const response = await fetch('/api/files/scrape/url', {
+            const response = await csrfFetch('/api/files/scrape/url', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ url: url }),
@@ -551,7 +552,7 @@ export default class extends Controller {
         try {
             // Fetch metadata for all selected files
             const results = await Promise.all(paths.map(async (path) => {
-                const response = await fetch('/api/files/scrape/read', {
+                const response = await csrfFetch('/api/files/scrape/read', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -762,7 +763,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
 
             try {
                 const number = this._numberFor(path, formNumber);
-                const response = await fetch('/api/files/scrape/update', {
+                const response = await csrfFetch('/api/files/scrape/update', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -995,7 +996,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
         let completedIds = new Set();
         let interval = setInterval(async () => {
             try {
-                const response = await fetch('/api/tasks/list');
+                const response = await csrfFetch('/api/tasks/list');
                 const tasks = await response.json();
                 const ourTasks = tasks.filter(t => taskIds.has(t.id));
                 const done = ourTasks.filter(t => t.status === 'completed' || t.status === 'failed').length;
@@ -1121,7 +1122,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
         }
 
         try {
-            const response = await fetch('/api/files/scrape/read', {
+            const response = await csrfFetch('/api/files/scrape/read', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -1215,7 +1216,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
                     submitBtn.textContent = this.translator.trans('js.scrape.saving');
 
                     try {
-                        const response = await fetch('/api/files/scrape/update', {
+                        const response = await csrfFetch('/api/files/scrape/update', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
@@ -1278,7 +1279,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
         const path = this._currentPath;
 
         try {
-            const response = await fetch('/api/files/scrape/delete', {
+            const response = await csrfFetch('/api/files/scrape/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

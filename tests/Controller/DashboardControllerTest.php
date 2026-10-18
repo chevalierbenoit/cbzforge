@@ -7,9 +7,11 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class DashboardControllerTest extends WebTestCase
 {
+    use AdminClientTrait;
+
     public function testEmptyDashboardShowsWelcome(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $crawler = $client->request('GET', '/');
 
         $this->assertResponseIsSuccessful();
@@ -23,7 +25,7 @@ class DashboardControllerTest extends WebTestCase
 
     public function testIndexShowsLibrariesAsCards(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test Lib');

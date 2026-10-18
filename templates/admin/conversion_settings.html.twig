@@ -12,6 +12,8 @@
     </div>
 
     <form method="post" action="{{ path('admin_conversion_settings') }}" class="card">
+
+        <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
         <div class="card-header">
             <h2 class="card-title">{{ 'admin.conversion.pdf_quality'|trans }}</h2>
         </div>

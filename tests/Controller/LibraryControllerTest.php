@@ -7,6 +7,8 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class LibraryControllerTest extends WebTestCase
 {
+    use AdminClientTrait;
+
     private string $tmpDir;
 
     protected function setUp(): void
@@ -27,7 +29,7 @@ class LibraryControllerTest extends WebTestCase
     #[\PHPUnit\Framework\Attributes\WithoutErrorHandler]
     public function testExploreListsEntries(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -45,7 +47,7 @@ class LibraryControllerTest extends WebTestCase
 
     public function testExploreShowsFoldersInGrid(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -66,7 +68,7 @@ class LibraryControllerTest extends WebTestCase
         mkdir($this->tmpDir.'/Serie A/Tome 1', 0777, true);
         mkdir($this->tmpDir.'/Autre', 0777, true);
 
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -84,7 +86,7 @@ class LibraryControllerTest extends WebTestCase
 
     public function testExploreWithSubPath(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
         $library = new Library();
         $library->setName('Test');
@@ -99,7 +101,7 @@ class LibraryControllerTest extends WebTestCase
 
     public function testExploreNotFound(): void
     {
-        $client = static::createClient();
+        $client = $this->createAdminClient();
         $client->request('GET', '/library/99999');
 
         $this->assertResponseStatusCodeSame(404);

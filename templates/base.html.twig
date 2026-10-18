@@ -7,6 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}cbzforge{% endblock %}</title>
+    <meta name="csrf-token" content="{{ csrf_token('submit') }}">
     <link rel="icon" href="{{ asset('favicon.svg') }}?v=2" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ asset('apple-touch-icon.png') }}?v=2">
     {# Apply the saved theme before the first paint, so a dark page never flashes light. #}
@@ -30,6 +31,7 @@
             <span class="brand-text">cbzforge</span>
         </a>
 
+        {% if app.user %}
         <nav class="app-nav" aria-label="{{ 'nav.main'|trans }}">
             <a href="{{ path('dashboard') }}" class="nav-link{{ app.current_route == 'dashboard' or library_section ? ' is-active' : '' }}"
                {{ app.current_route == 'dashboard' or library_section ? 'aria-current="page"' : '' }}>
@@ -40,6 +42,7 @@
                 <span>{{ 'nav.administration'|trans }}</span>
             </a>
         </nav>
+        {% endif %}
 
         <div class="header-spacer"></div>
 
@@ -49,6 +52,7 @@
             <span class="theme-icon theme-icon-sun">{{ ui.icon('sun') }}</span>
         </button>
 
+        {% if app.user %}
         <div class="queue" data-controller="status-bar"
              data-status-bar-locale-value="{{ app.request.locale }}"
              data-action="mouseenter->status-bar#showPanel mouseleave->status-bar#hidePanelWithDelay">
@@ -67,6 +71,11 @@
                 <div class="status-bar-panel-body" data-status-bar-target="body"></div>
             </div>
         </div>
+        <form method="post" action="{{ path('app_logout') }}" class="logout-form">
+            <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
+            <button type="submit" class="nav-link logout-link">{{ 'nav.logout'|trans }}</button>
+        </form>
+        {% endif %}
     </header>
 
     {% if admin_section %}

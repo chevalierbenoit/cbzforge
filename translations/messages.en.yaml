@@ -162,3 +162,32 @@ dashboard.step2_text: Select a comic and search its metadata. Only enabled and c
 dashboard.step2_link: Check the metadata sources
 dashboard.step3_title: Rename consistently
 dashboard.step3_text: Choose a naming expression. Files are renamed from the library root, into one folder per series.
+
+# Authentication and onboarding
+nav.logout: Sign out
+login.title: Sign in
+login.username: Username
+login.password: Password
+login.submit: Sign in
+setup.title: Create the administrator
+setup.lead: This is the only account of this installation. It opens every page, so choose a strong password.
+setup.username: Username
+setup.username_chars: Use letters, digits, dots, dashes or underscores.
+setup.password: Password
+setup.password_confirm: Confirm the password
+setup.passwords_differ: The two passwords are not the same.
+setup.password_help: At least %min% characters.
+setup.submit: Create the account
+setup.created: Account created. Sign in to continue.
+onboarding.title: Set up cbzforge
+onboarding.step: Step %current% of %total%
+onboarding.library_title: Add your first library
+onboarding.library_lead: The folder that holds your comics. cbzforge reads it in place and never copies it.
+onboarding.library_submit: Continue
+onboarding.skip: Skip for now
+onboarding.sources_title: Choose the metadata sources
+onboarding.sources_lead: Sources that need no key are ticked. You can change this later in Administration.
+onboarding.needs_key: Needs an API key. Add it in Administration, then enable the source.
+onboarding.no_key: No key needed.
+onboarding.finish: Finish
+onboarding.finished: Setup complete.

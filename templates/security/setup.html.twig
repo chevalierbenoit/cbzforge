@@ -1,0 +1,24 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'setup.title'|trans }} — cbzforge{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+    {{ form_start(form, {attr: {class: 'card auth-card'}}) }}
+        <div class="card-header">
+            <h1 class="card-title">{{ 'setup.title'|trans }}</h1>
+        </div>
+        <div class="card-body">
+            <p class="page-lead">{{ 'setup.lead'|trans }}</p>
+            {{ form_errors(form) }}
+            {{ form_row(form.username, {row_attr: {class: 'form-group'}}) }}
+            {{ form_row(form.password.first, {row_attr: {class: 'form-group'}}) }}
+            {{ form_row(form.password.second, {row_attr: {class: 'form-group'}}) }}
+            <p class="form-help">{{ 'setup.password_help'|trans({'%min%': 10}) }}</p>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary">{{ 'setup.submit'|trans }}</button>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

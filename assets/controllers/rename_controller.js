@@ -1,6 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 import { Translator } from '../translator.js';
 import { setMetadataBadge } from '../badges.js';
+import { csrfFetch } from '../csrf.js';
 
 function escapeHtml(str) {
     const div = document.createElement('div');
@@ -90,7 +91,7 @@ export default class extends Controller {
         if (expression) {
             payload.expression = expression;
         }
-        const response = await fetch('/api/files/rename/preview', {
+        const response = await csrfFetch('/api/files/rename/preview', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -107,7 +108,7 @@ export default class extends Controller {
         if (expression) {
             payload.expression = expression;
         }
-        const response = await fetch('/api/files/rename/execute', {
+        const response = await csrfFetch('/api/files/rename/execute', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -221,11 +222,22 @@ export default class extends Controller {
         }
     }
 
+    _confirmConversion(paths) {
+        const names = paths.map(p => `• ${p.split('/').pop() || p}`).join('\n');
+        const message = this.translator.trans('js.convert.confirm', { count: paths.length });
+
+        return confirm(`${message}\n\n${names}`);
+    }
+
     async convert(event) {
         const convertBtn = event.currentTarget;
         const paths = this._selectedPaths();
 
         if (paths.length === 0) return;
+
+        // The conversion deletes each original once its CBZ exists: ask first, naming the files.
+        const toConvert = paths.filter(p => ['cbr', 'pdf', 'epub'].includes(p.split('.').pop().toLowerCase()));
+        if (toConvert.length > 0 && !this._confirmConversion(toConvert)) return;
 
         if (paths.length === 1) {
             const path = paths[0];
@@ -236,7 +248,7 @@ export default class extends Controller {
             this._setStatusBar(`${this.translator.trans('js.rename.converting')} ${filename}`);
 
             try {
-                const response = await fetch('/api/files/convert', {
+                const response = await csrfFetch('/api/files/convert', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -284,7 +296,7 @@ export default class extends Controller {
             this._setStatusBar(`${this.translator.trans('js.rename.converting')} 0/${convertible.length}`);
 
             try {
-                const response = await fetch('/api/files/convert/batch', {
+                const response = await csrfFetch('/api/files/convert/batch', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -318,7 +330,7 @@ export default class extends Controller {
 
         let interval = setInterval(async () => {
             try {
-                const statusRes = await fetch('/api/tasks/status');
+                const statusRes = await csrfFetch('/api/tasks/status');
                 const statusData = await statusRes.json();
                 const done = (statusData.completed || 0) + (statusData.failed || 0);
                 const pending = (statusData.pending || 0) + (statusData.processing || 0);
@@ -347,7 +359,7 @@ export default class extends Controller {
 
     async _checkCompletedTasks() {
         try {
-            const response = await fetch('/api/tasks/list');
+            const response = await csrfFetch('/api/tasks/list');
             const tasks = await response.json();
             for (const task of tasks) {
                 if (task.type === 'convert' && task.status === 'completed' && !this._convertedTaskIds.has(task.id)) {

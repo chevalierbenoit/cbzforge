@@ -71,7 +71,9 @@ php bin/console messenger:consume async -vv
 
 ## Usage
 
-1. Add a library path in the admin (`/admin/libraries`), or through the REST API (`/api/libraries`).
+0. On first start, create the administrator account on `/setup`. It is the only account, and the setup page closes after it is created.
+1. An assistant then adds your first library and lets you choose the metadata sources. You can skip it and configure everything in the admin (`/admin/libraries`).
+   The library can also be added through the REST API (`/api/libraries`).
 2. Browse your libraries from the dashboard (`/`).
 3. Select one or more files, then scrape their metadata.
 4. Confirm the metadata to write ComicInfo.xml into the archives.
@@ -130,7 +132,9 @@ The OpenAPI documentation is served at `/api/docs`. The full route list is avail
 
 ## Security
 
-- **Local use only.** The app has no authentication and no CSRF protection. Do not expose it to a network you do not trust.
+- **Sign-in required.** Every page and API route needs the administrator's account; the sign-in page is rate limited (5 attempts, then a 15 minute wait). There is no default password.
+- **Single account.** Version 1 has one administrator and no API key. Multiple users and an API key are not implemented.
+- **Requests are checked.** Every request that changes data needs the session's CSRF token (a hidden `_token` field in forms, the `X-CSRF-Token` header for scripts) and must not come from another site (`Origin` check). Session cookies are `SameSite=Lax` as a second layer. Behind a reverse proxy, the host and scheme seen by the app must match the browser's (configure trusted proxies).
 - **Set your own `APP_SECRET`.** The value in `.env` is a placeholder. Put a real secret in `.env.local`, which is git-ignored:
 
   ```bash

@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'onboarding.title'|trans }} — cbzforge{% endblock %}
+
+{% block body %}
+<div class="page page-narrow">
+    <p class="step-indicator">{{ 'onboarding.step'|trans({'%current%': 2, '%total%': 2}) }}</p>
+    <div class="page-header">
+        <div>
+            <h1>{{ 'onboarding.sources_title'|trans }}</h1>
+            <p class="page-lead">{{ 'onboarding.sources_lead'|trans }}</p>
+        </div>
+    </div>
+
+    <form method="post" action="{{ path('app_onboarding_sources') }}" class="stack" id="sources-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
+        {% for source in sources %}
+            {% set slug = source.name|replace({' ': '_'}) %}
+            <section class="card">
+                <div class="card-body">
+                    <label class="form-checkbox">
+                        <input type="checkbox" name="scraper_enabled_{{ slug }}" value="1"
+                               {% if source.checked %}checked{% endif %}
+                               {% if not source.configured %}disabled{% endif %}>
+                        <strong>{{ source.name }}</strong>
+                    </label>
+                    {% if not source.configured %}
+                        <p class="form-help">{{ 'onboarding.needs_key'|trans }}</p>
+                    {% else %}
+                        <p class="form-help">{{ 'onboarding.no_key'|trans }}</p>
+                    {% endif %}
+                </div>
+            </section>
+        {% endfor %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">{{ 'onboarding.finish'|trans }}</button>
+        </div>
+    </form>
+    <form method="post" action="{{ path('app_onboarding_skip') }}" class="skip-form">
+        <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
+        <button type="submit" class="btn btn-ghost">{{ 'onboarding.skip'|trans }}</button>
+    </form>
+</div>
+{% endblock %}

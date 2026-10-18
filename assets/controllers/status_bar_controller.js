@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 import { Translator } from '../translator.js';
+import { csrfFetch } from '../csrf.js';
 
 export default class extends Controller {
     static targets = ['panel', 'body', 'badge'];
@@ -46,7 +47,7 @@ export default class extends Controller {
 
     async _poll() {
         try {
-            const response = await fetch('/api/tasks/status');
+            const response = await csrfFetch('/api/tasks/status');
             const data = await response.json();
             const pending = (data.pending || 0) + (data.processing || 0);
 
@@ -65,7 +66,7 @@ export default class extends Controller {
         if (this._loaded && this.panelTarget.classList.contains('open')) return;
 
         try {
-            const response = await fetch('/api/tasks/list');
+            const response = await csrfFetch('/api/tasks/list');
             const tasks = await response.json();
             this._render(tasks);
             this._loaded = true;

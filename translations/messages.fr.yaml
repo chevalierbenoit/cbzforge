@@ -162,3 +162,32 @@ dashboard.step2_text: Sélectionnez une BD et recherchez ses métadonnées. Seul
 dashboard.step2_link: Vérifier les sources de métadonnées
 dashboard.step3_title: Renommer de façon cohérente
 dashboard.step3_text: Choisissez une expression de nommage. Les fichiers sont renommés depuis la racine de la bibliothèque, dans un dossier par série.
+
+# Authentification et assistant d'accueil
+nav.logout: Se déconnecter
+login.title: Connexion
+login.username: Identifiant
+login.password: Mot de passe
+login.submit: Se connecter
+setup.title: Créer l'administrateur
+setup.lead: C'est le seul compte de cette installation. Il donne accès à toutes les pages, choisissez donc un mot de passe solide.
+setup.username: Identifiant
+setup.username_chars: Lettres, chiffres, points, tirets ou tirets bas.
+setup.password: Mot de passe
+setup.password_confirm: Confirmer le mot de passe
+setup.passwords_differ: Les deux mots de passe ne sont pas identiques.
+setup.password_help: '%min% caractères au minimum.'
+setup.submit: Créer le compte
+setup.created: Compte créé. Connectez-vous pour continuer.
+onboarding.title: Configurer cbzforge
+onboarding.step: Étape %current% sur %total%
+onboarding.library_title: Ajouter votre première bibliothèque
+onboarding.library_lead: Le dossier qui contient vos BD. cbzforge le lit sur place et ne le copie jamais.
+onboarding.library_submit: Continuer
+onboarding.skip: Passer pour l'instant
+onboarding.sources_title: Choisir les sources de métadonnées
+onboarding.sources_lead: Les sources sans clé sont cochées. Vous pourrez changer ce choix dans l'administration.
+onboarding.needs_key: Nécessite une clé API. Renseignez-la dans l'administration, puis activez la source.
+onboarding.no_key: Aucune clé nécessaire.
+onboarding.finish: Terminer
+onboarding.finished: Configuration terminée.

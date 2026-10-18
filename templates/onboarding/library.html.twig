@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'onboarding.title'|trans }} — cbzforge{% endblock %}
+
+{% block body %}
+<div class="page page-narrow">
+    <p class="step-indicator">{{ 'onboarding.step'|trans({'%current%': 1, '%total%': 2}) }}</p>
+    <div class="page-header">
+        <div>
+            <h1>{{ 'onboarding.library_title'|trans }}</h1>
+            <p class="page-lead">{{ 'onboarding.library_lead'|trans }}</p>
+        </div>
+    </div>
+
+    <form method="post" action="{{ path('app_onboarding_library') }}" class="card">
+
+        <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
+        <div class="card-body">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="library-name">{{ 'admin.name_placeholder'|trans }}</label>
+                    <input type="text" id="library-name" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="library-path">{{ 'admin.path_placeholder'|trans }}</label>
+                    <input type="text" id="library-path" name="path" required placeholder="/chemin/vers/dossier">
+                    <span class="form-help">{{ 'admin.libraries.path_help'|trans }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <button type="submit" class="btn btn-primary">{{ 'onboarding.library_submit'|trans }}</button>
+        </div>
+    </form>
+
+    <form id="skip-onboarding" method="post" action="{{ path('app_onboarding_skip') }}" class="skip-form">
+
+        <input type="hidden" name="_token" value="{{ csrf_token('submit') }}">
+        <button type="submit" class="btn btn-ghost">{{ 'onboarding.skip'|trans }}</button>
+    </form>
+</div>
+{% endblock %}

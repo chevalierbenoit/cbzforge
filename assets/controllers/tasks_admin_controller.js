@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus';
 import { Translator } from '../translator.js';
+import { csrfFetch } from '../csrf.js';
 
 export default class extends Controller {
     static targets = ['workerBadge', 'workerLabel'];
@@ -19,7 +20,7 @@ export default class extends Controller {
 
     async _pollWorker() {
         try {
-            const response = await fetch('/api/worker/status');
+            const response = await csrfFetch('/api/worker/status');
             const data = await response.json();
             if (!this.hasWorkerBadgeTarget) return;
             this.workerBadgeTarget.classList.toggle('badge-success', data.alive);
@@ -33,7 +34,7 @@ export default class extends Controller {
         if (!confirm(this.translator.trans('js.tasks_admin.confirm_restart'))) return;
         event.target.disabled = true;
         try {
-            await fetch('/api/worker/restart', { method: 'POST' });
+            await csrfFetch('/api/worker/restart', { method: 'POST' });
         } finally {
             setTimeout(() => location.reload(), 2000);
         }
@@ -41,19 +42,19 @@ export default class extends Controller {
 
     async deleteTask(event) {
         if (!confirm(this.translator.trans('js.tasks_admin.confirm_delete'))) return;
-        await fetch(`/api/tasks/${event.currentTarget.dataset.id}/delete`, { method: 'POST' });
+        await csrfFetch(`/api/tasks/${event.currentTarget.dataset.id}/delete`, { method: 'POST' });
         location.reload();
     }
 
     async retryTask(event) {
         if (!confirm(this.translator.trans('js.tasks_admin.confirm_retry'))) return;
-        await fetch(`/api/tasks/${event.currentTarget.dataset.id}/retry`, { method: 'POST' });
+        await csrfFetch(`/api/tasks/${event.currentTarget.dataset.id}/retry`, { method: 'POST' });
         location.reload();
     }
 
     async purgeTasks() {
         if (!confirm(this.translator.trans('js.tasks_admin.confirm_purge'))) return;
-        await fetch('/api/tasks/purge', { method: 'POST' });
+        await csrfFetch('/api/tasks/purge', { method: 'POST' });
         location.reload();
     }
 }

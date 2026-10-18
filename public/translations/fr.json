@@ -134,5 +134,6 @@
     "js.scrape.section_credits": "Crédits",
     "js.scrape.section_edition": "Édition et contenu",
     "js.scrape.open_page": "Ouvrir la fiche",
-    "js.scrape.numbers_ready": "Numéros attribués, enregistrés avec les métadonnées :"
+    "js.scrape.numbers_ready": "Numéros attribués, enregistrés avec les métadonnées :",
+    "js.convert.confirm": "Convertir %count% fichier(s) en CBZ ? Chaque fichier d'origine sera supprimé une fois le CBZ créé."
 }
