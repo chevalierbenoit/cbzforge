@@ -3,5 +3,7 @@
     php_fastcgi 127.0.0.1:9000 {
         try_files {path} /index.php
     }
+    # Catalogues change with deployments: always revalidate, never serve a stale copy.
+    header /translations/* Cache-Control "no-cache"
     file_server
 }

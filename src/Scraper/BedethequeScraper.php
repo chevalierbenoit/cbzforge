@@ -78,10 +78,9 @@ class BedethequeScraper implements ScraperInterface
 
         $series = $this->getXpathText($xpath, '//div[contains(@class, "bandeau-info")]//h1/a');
 
-        $uls = $xpath->query("//ul[contains(@class, 'liste-albums')]");
-        $secondUl = $uls->item(1);
-        if ($secondUl instanceof \DOMElement) {
-            $items = $secondUl->getElementsByTagName('li');
+        $list = self::albumList($xpath);
+        if (null !== $list) {
+            $items = $list->getElementsByTagName('li');
             foreach ($items as $item) {
                 $links = $item->getElementsByTagName('a');
                 if (0 === $links->length) {
@@ -132,6 +131,22 @@ class BedethequeScraper implements ScraperInterface
         }
 
         return [];
+    }
+
+    /** First node matching an XPath expression, or null (DOMXPath::query() returns false on an invalid expression). */
+    private static function firstNode(\DOMXPath $xpath, string $expression, ?\DOMNode $context = null): ?\DOMNode
+    {
+        $nodes = null !== $context ? $xpath->query($expression, $context) : $xpath->query($expression);
+
+        return false === $nodes ? null : $nodes->item(0);
+    }
+
+    /** The album list of a series page. The site renamed it from liste-albums to bdt-box-albums-liste. */
+    private static function albumList(\DOMXPath $xpath): ?\DOMElement
+    {
+        $list = self::firstNode($xpath, "//ul[contains(@class, 'bdt-box-albums-liste')]");
+
+        return $list instanceof \DOMElement ? $list : null;
     }
 
     private static function invertArticle(string $query): string
@@ -187,17 +202,12 @@ class BedethequeScraper implements ScraperInterface
         @$doc->loadHTML('<?xml encoding="UTF-8">'.$html);
         $xpath = new \DOMXPath($doc);
 
-        $uls = $xpath->query("//ul[contains(@class, 'liste-albums')]");
-        if ($uls->length < 2) {
+        $list = self::albumList($xpath);
+        if (null === $list) {
             return [];
         }
 
-        $secondUl = $uls->item(1);
-        if (!$secondUl instanceof \DOMElement) {
-            return [];
-        }
-
-        $items = $secondUl->getElementsByTagName('li');
+        $items = $list->getElementsByTagName('li');
 
         foreach ($items as $item) {
             $links = $item->getElementsByTagName('a');
@@ -207,7 +217,9 @@ class BedethequeScraper implements ScraperInterface
 
             $link = $links->item(0);
             $href = $link->getAttribute('href');
-            $title = trim($link->textContent);
+            // The album title is in its own span; the link also holds the number and the date.
+            $titleNode = self::firstNode($xpath, './/span[contains(@class, "bdt-box-albums-titre")]', $link);
+            $title = trim(preg_replace('/\s+/', ' ', $titleNode ? $titleNode->textContent : $link->textContent) ?? '');
 
             if (empty($href) || empty($title)) {
                 continue;
@@ -249,20 +261,21 @@ class BedethequeScraper implements ScraperInterface
         @$doc->loadHTML('<?xml encoding="UTF-8">'.$html);
         $xpath = new \DOMXPath($doc);
 
-        $series = $this->getXpathText($xpath, '//div[contains(@class, "bandeau-info")]//h1/a');
-        $h2 = $this->getXpathText($xpath, '//div[contains(@class, "bandeau-info")]//h2');
+        $series = $this->getXpathText($xpath, '//h1/a');
+
+        // Microdata: "Série - Titre" in name, "Tome N" in alternativeheadline.
+        $fullName = $this->getXpathText($xpath, '//meta[@itemprop="name"]/@content');
+        $title = null;
+        if (null !== $fullName && $fullName !== $series) {
+            $title = null !== $series && str_starts_with($fullName, $series.' - ')
+                ? trim(substr($fullName, \strlen($series) + 3))
+                : $fullName;
+        }
 
         $number = null;
-        $title = null;
-        if (null !== $h2) {
-            if (preg_match('/^\s*(\d+)\s*\.\s*(.+)$/s', $h2, $m)) {
-                $number = (int) $m[1];
-                $title = trim($m[2]);
-            } elseif (preg_match('/^\s*(\d+)\s*$/', $h2, $m)) {
-                $number = (int) $m[1];
-            } else {
-                $title = trim($h2);
-            }
+        $headline = $this->getXpathText($xpath, '//meta[@itemprop="alternativeheadline"]/@content');
+        if (null !== $headline && preg_match('/(\d+)/', $headline, $m)) {
+            $number = (int) $m[1];
         }
 
         $writer = null;
@@ -270,41 +283,39 @@ class BedethequeScraper implements ScraperInterface
         $penciler = null;
         $inker = null;
         $colorist = null;
-        $authorLinks = $xpath->query('//div[contains(@class, "liste-auteurs")]/a');
-        $authorMetiers = $xpath->query('//div[contains(@class, "liste-auteurs")]/span[contains(@class, "metier")]');
+        // Each author is <span><a>Name</a> <small>(Role)</small></span>.
+        foreach ($xpath->query('//div[contains(@class, "liste-auteurs")]/span') ?: [] as $authorNode) {
+            $nameNode = self::firstNode($xpath, './/a', $authorNode);
+            $roleNode = self::firstNode($xpath, './/small', $authorNode);
+            if (!$nameNode || !$roleNode) {
+                continue;
+            }
 
-        if (false !== $authorLinks && false !== $authorMetiers) {
-            for ($i = 0; $i < $authorLinks->length; ++$i) {
-                $name = trim($authorLinks->item($i)->textContent);
-                $role = ($i < $authorMetiers->length) ? trim($authorMetiers->item($i)->textContent) : '';
+            $name = trim($nameNode->textContent);
+            $role = trim($roleNode->textContent);
+            // Placeholders such as "<Quadrichromie>" for colouring are not people.
+            if ('' === $name || str_starts_with($name, '<')) {
+                continue;
+            }
 
-                if (str_contains($role, 'Scénario')) {
-                    $writer = $this->normalizeAuthorName($name);
-                } elseif (str_contains($role, 'Dessin')) {
-                    $artist = $this->normalizeAuthorName($name);
-                    $penciler = $artist;
-                } elseif (str_contains($role, 'Encre')) {
-                    $inker = $this->normalizeAuthorName($name);
-                } elseif (str_contains($role, 'Couleur')) {
-                    $colorist = $this->normalizeAuthorName($name);
-                }
+            if (str_contains($role, 'Scénario')) {
+                $writer ??= $this->normalizeAuthorName($name);
+            } elseif (str_contains($role, 'Dessin')) {
+                $artist ??= $this->normalizeAuthorName($name);
+                $penciler ??= $artist;
+            } elseif (str_contains($role, 'Encre')) {
+                $inker ??= $this->normalizeAuthorName($name);
+            } elseif (str_contains($role, 'Couleur')) {
+                $colorist ??= $this->normalizeAuthorName($name);
             }
         }
 
-        if (null === $writer && false !== $authorLinks && $authorLinks->length > 0) {
-            $writer = $this->normalizeAuthorName(trim($authorLinks->item(0)->textContent));
-        }
-
         $publisher = $this->getXpathText($xpath, '//span[@itemprop="publisher"]');
-        if (null === $publisher) {
-            $publisherNode = $xpath->query('//span[contains(@class, "editeur")]')->item(0);
-            $publisher = $publisherNode ? trim($publisherNode->textContent) : null;
-        }
 
-        $yearRaw = $this->getXpathText($xpath, '//span[contains(@class, "annee")]');
-        $year = null !== $yearRaw ? (int) $yearRaw : null;
+        $yearRaw = $this->getXpathText($xpath, '//meta[@itemprop="datePublished"]/@content');
+        $year = null !== $yearRaw && preg_match('/^(\d{4})/', $yearRaw, $m) ? (int) $m[1] : null;
 
-        $isbn = $this->getXpathText($xpath, '//span[@itemprop="isbn"]');
+        $isbn = $this->getXpathText($xpath, '//input[@id="EAN"]/@value') ?: null;
 
         $summary = null;
         $descNode = $xpath->query('//span[@itemprop="description"]')->item(0);
@@ -314,9 +325,6 @@ class BedethequeScraper implements ScraperInterface
             $summary = str_replace('Lire la suite', '', $summary);
             $summary = trim($summary);
         }
-
-        $pagesRaw = $this->getXpathText($xpath, '//span[@itemprop="numberOfPages"]');
-        $pages = null !== $pagesRaw ? (int) $pagesRaw : null;
 
         return new ComicInfo(
             series: $series,
