@@ -54,6 +54,7 @@ class ScrapeFileMessageHandlerTest extends TestCase
 
         $chain = $this->createStub(ScraperChain::class);
         $chain->method('getScrapers')->willReturn([$scraper]);
+        $chain->method('isAvailable')->willReturn(true);
 
         $settings = $this->createStub(SettingsService::class);
         $settings->method('get')->willReturn('1');

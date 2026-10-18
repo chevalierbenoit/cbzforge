@@ -270,6 +270,17 @@ class AdminControllerTest extends WebTestCase
         $this->assertSelectorTextContains('body', 'Settings saved.');
     }
 
+    public function testSettingsPageDisablesUnconfiguredScraper(): void
+    {
+        $client = static::createClient();
+        $crawler = $client->request('GET', '/admin/settings');
+
+        $this->assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('body', 'Not configured');
+        $this->assertNotNull($crawler->filter('#toggle-Google_Books')->attr('disabled'));
+        $this->assertNull($crawler->filter('#toggle-BDGest')->attr('disabled'));
+    }
+
     public function testSettingsPostWithConfigField(): void
     {
         $client = static::createClient();

@@ -69,7 +69,7 @@ class ScrapeFileMessageHandler
     {
         foreach ($this->scraperChain->getScrapers() as $scraper) {
             if ($scraper->getName() === $name) {
-                if ('0' === $this->settings->get('scraper.'.$name.'.enabled')) {
+                if (!$this->scraperChain->isAvailable($scraper, $this->settings)) {
                     return null;
                 }
 

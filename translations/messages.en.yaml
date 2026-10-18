@@ -53,8 +53,9 @@ admin.cancel: Cancel
 
 # Admin — Settings
 admin.settings.scrapers: Scraper configuration
-admin.settings.active: Active
-admin.settings.inactive: Inactive
+admin.settings.available: Available
+admin.settings.not_configured: Not configured
+admin.settings.inactive: Disabled
 admin.settings.no_config: No configuration required.
 
 # Admin — Rename settings

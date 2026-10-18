@@ -36,6 +36,7 @@ class GoogleBooksScraper implements ScraperInterface
                 'key' => 'google_books_api_key',
                 'label' => 'Clef API Google Books',
                 'type' => 'password',
+                'required' => true,
             ],
         ];
     }

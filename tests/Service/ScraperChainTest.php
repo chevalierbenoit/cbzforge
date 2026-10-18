@@ -46,24 +46,84 @@ class ScraperChainTest extends TestCase
         $this->assertNull($chain->findScraperForUrl('https://example.com'));
     }
 
-    public function testGetActiveScrapersFiltersInactive(): void
+    public function testGetAvailableScrapersFiltersDisabled(): void
     {
         $scraper1 = $this->createStub(ScraperInterface::class);
         $scraper1->method('getName')->willReturn('Google Books');
+        $scraper1->method('getConfigFields')->willReturn([]);
         $scraper2 = $this->createStub(ScraperInterface::class);
         $scraper2->method('getName')->willReturn('BDGest');
+        $scraper2->method('getConfigFields')->willReturn([]);
 
         $settings = $this->createStub(SettingsService::class);
-        // BDGest inactive (enabled=0), Google Books active (enabled=1 or no value)
+        // BDGest disabled (enabled=0), Google Books enabled (no value yet)
         $settings->method('get')->willReturnMap([
             ['scraper.BDGest.enabled', '0'],
             ['scraper.Google Books.enabled', null],
         ]);
 
         $chain = new ScraperChain([$scraper1, $scraper2]);
-        $active = $chain->getActiveScrapers($settings);
+        $available = $chain->getAvailableScrapers($settings);
 
-        $this->assertCount(1, $active);
-        $this->assertSame('Google Books', $active[0]->getName());
+        $this->assertCount(1, $available);
+        $this->assertSame('Google Books', $available[0]->getName());
+    }
+
+    public function testScraperWithMissingRequiredSettingIsNotAvailable(): void
+    {
+        $scraper = $this->createStub(ScraperInterface::class);
+        $scraper->method('getName')->willReturn('Google Books');
+        $scraper->method('getConfigFields')->willReturn([
+            ['key' => 'google_books_api_key', 'label' => 'Key', 'type' => 'password', 'required' => true],
+        ]);
+
+        $settings = $this->createStub(SettingsService::class);
+        $settings->method('get')->willReturn(null);
+        $settings->method('has')->willReturn(false);
+
+        $chain = new ScraperChain([$scraper]);
+
+        $this->assertFalse($chain->isConfigured($scraper, $settings));
+        $this->assertFalse($chain->isAvailable($scraper, $settings));
+        $this->assertSame([], $chain->getAvailableScrapers($settings));
+    }
+
+    public function testOptionalSettingDoesNotBlockAvailability(): void
+    {
+        $scraper = $this->createStub(ScraperInterface::class);
+        $scraper->method('getName')->willReturn('Custom');
+        $scraper->method('getConfigFields')->willReturn([
+            ['key' => 'custom.optional', 'label' => 'Optional', 'type' => 'text'],
+        ]);
+
+        $settings = $this->createStub(SettingsService::class);
+        $settings->method('get')->willReturn(null);
+        $settings->method('has')->willReturn(false);
+
+        $chain = new ScraperChain([$scraper]);
+
+        $this->assertTrue($chain->isConfigured($scraper, $settings));
+        $this->assertTrue($chain->isAvailable($scraper, $settings));
+    }
+
+    public function testAvailableRequiresEnabledAndConfigured(): void
+    {
+        $scraper = $this->createStub(ScraperInterface::class);
+        $scraper->method('getName')->willReturn('Google Books');
+        $scraper->method('getConfigFields')->willReturn([
+            ['key' => 'google_books_api_key', 'label' => 'Key', 'type' => 'password', 'required' => true],
+        ]);
+
+        $chain = new ScraperChain([$scraper]);
+
+        $configured = $this->createStub(SettingsService::class);
+        $configured->method('get')->willReturnMap([['scraper.Google Books.enabled', '1']]);
+        $configured->method('has')->willReturn(true);
+        $this->assertTrue($chain->isAvailable($scraper, $configured));
+
+        $disabled = $this->createStub(SettingsService::class);
+        $disabled->method('get')->willReturnMap([['scraper.Google Books.enabled', '0']]);
+        $disabled->method('has')->willReturn(true);
+        $this->assertFalse($chain->isAvailable($scraper, $disabled));
     }
 }

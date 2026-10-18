@@ -144,7 +144,8 @@ class AdminController extends AbstractController
             $scrapers[] = [
                 'name' => $name,
                 'fields' => $fields,
-                'enabled' => '0' !== $settings->get('scraper.'.$name.'.enabled'),
+                'enabled' => $scraperChain->isEnabled($scraper, $settings),
+                'configured' => $scraperChain->isConfigured($scraper, $settings),
             ];
         }
 

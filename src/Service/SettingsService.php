@@ -31,8 +31,11 @@ class SettingsService
         $this->em->flush();
     }
 
+    /** An empty value counts as not set. */
     public function has(string $key): bool
     {
-        return null !== $this->get($key);
+        $value = $this->get($key);
+
+        return null !== $value && '' !== $value;
     }
 }
