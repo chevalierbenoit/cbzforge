@@ -263,13 +263,13 @@ class ScrapeControllersTest extends WebTestCase
         $this->assertSame('No scraper supports this URL', $data['error']);
     }
 
-    public function testScrapeUrlWithDummyScraper(): void
+    public function testScrapeUrlWithFakeScraper(): void
     {
         $client = static::createClient();
         $client->request('POST', '/api/files/scrape/url', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
-            'url' => 'dummy:spawn',
+            'url' => 'fake:spawn',
         ]));
 
         $this->assertResponseIsSuccessful();
@@ -285,7 +285,7 @@ class ScrapeControllersTest extends WebTestCase
         $em = $client->getContainer()->get('doctrine.orm.entity_manager');
 
         $setting = new Setting();
-        $setting->setKey('scraper.Dummy.enabled');
+        $setting->setKey('scraper.Fake.enabled');
         $setting->setValue('0');
         $em->persist($setting);
         $em->flush();
@@ -293,7 +293,7 @@ class ScrapeControllersTest extends WebTestCase
         $client->request('POST', '/api/files/scrape/url', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
-            'url' => 'dummy:spawn',
+            'url' => 'fake:spawn',
         ]));
 
         $this->assertResponseStatusCodeSame(400);
@@ -308,7 +308,7 @@ class ScrapeControllersTest extends WebTestCase
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
             'query' => 'spawn',
-            'scraper' => 'Dummy',
+            'scraper' => 'Fake',
         ]));
 
         $this->assertResponseIsSuccessful();
@@ -376,8 +376,8 @@ class ScrapeControllersTest extends WebTestCase
         $client->request('POST', '/api/files/scrape/confirm', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
-            'confirm_identifier' => 'dummy:spawn',
-            'scraper' => 'Dummy',
+            'confirm_identifier' => 'fake:spawn',
+            'scraper' => 'Fake',
             'library_id' => $library->getId(),
             'path' => 'test.cbz',
         ]));
@@ -398,8 +398,8 @@ class ScrapeControllersTest extends WebTestCase
         $client->request('POST', '/api/files/scrape/confirm', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
-            'confirm_identifier' => 'dummy:spawn',
-            'scraper' => 'Dummy',
+            'confirm_identifier' => 'fake:spawn',
+            'scraper' => 'Fake',
             'library_id' => 99999,
             'path' => 'test.cbz',
         ]));
@@ -436,7 +436,7 @@ class ScrapeControllersTest extends WebTestCase
         $client->request('POST', '/api/files/scrape/confirm', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
-            'confirm_identifier' => 'dummy:spawn',
+            'confirm_identifier' => 'fake:spawn',
             'scraper' => 'NonExistent',
             'library_id' => $library->getId(),
             'path' => 'test.cbz',
@@ -456,7 +456,7 @@ class ScrapeControllersTest extends WebTestCase
         $client->request('POST', '/api/files/scrape/confirm', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
-            'confirm_identifier' => 'dummy:spawn',
+            'confirm_identifier' => 'fake:spawn',
             'scraper' => 'NonExistent',
             'library_id' => 1,
             'path' => 'test.cbz',
@@ -480,8 +480,8 @@ class ScrapeControllersTest extends WebTestCase
         $client->request('POST', '/api/files/scrape/confirm', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
-            'confirm_identifier' => 'dummy:spawn',
-            'scraper' => 'Dummy',
+            'confirm_identifier' => 'fake:spawn',
+            'scraper' => 'Fake',
             'library_id' => $library->getId(),
             'path' => 'test.cbz',
             'batch' => true,
@@ -494,8 +494,8 @@ class ScrapeControllersTest extends WebTestCase
         $task = $em->find(\App\Entity\Task::class, $data['task_id']);
         $this->assertNotNull($task);
         $payload = json_decode($task->getPayload() ?? '', true);
-        $this->assertSame('Dummy', $payload['scraper']);
-        $this->assertSame('dummy:spawn', $payload['confirm_identifier']);
+        $this->assertSame('Fake', $payload['scraper']);
+        $this->assertSame('fake:spawn', $payload['confirm_identifier']);
     }
 
     public function testCoverEndpointNoImages(): void

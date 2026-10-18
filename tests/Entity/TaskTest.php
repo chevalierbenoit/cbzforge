@@ -17,7 +17,7 @@ class TaskTest extends TestCase
     public function testSetPayload(): void
     {
         $task = new Task();
-        $payload = json_encode(['scraper' => 'Dummy', 'confirm_identifier' => 'dummy:spawn']);
+        $payload = json_encode(['scraper' => 'Fake', 'confirm_identifier' => 'fake:spawn']);
         $task->setPayload($payload);
 
         $this->assertSame($payload, $task->getPayload());

@@ -1,0 +1,4 @@
+services:
+    # Fake scraper used by functional tests; never registered outside the test environment.
+    App\Tests\Support\FakeScraper:
+        tags: ['app.scraper']

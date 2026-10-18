@@ -105,14 +105,14 @@ class TaskActionsTest extends TestCase
         $task->setStatus(Task::STATUS_FAILED);
         $task->setLibraryId(3);
         $task->setPath('a.cbz');
-        $task->setPayload(json_encode(['scraper' => 'Dummy', 'confirm_identifier' => 'dummy:x']));
+        $task->setPayload(json_encode(['scraper' => 'Fake', 'confirm_identifier' => 'fake:x']));
 
         $this->createController($task)->retry(1);
 
         $message = $this->dispatched[0];
         $this->assertInstanceOf(ScrapeFileMessage::class, $message);
-        $this->assertSame('Dummy', $message->getScraper());
-        $this->assertSame('dummy:x', $message->getIdentifier());
+        $this->assertSame('Fake', $message->getScraper());
+        $this->assertSame('fake:x', $message->getIdentifier());
     }
 
     public function testRetryScrapeTaskWithoutPayloadFails(): void

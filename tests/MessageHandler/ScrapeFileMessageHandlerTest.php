@@ -49,7 +49,7 @@ class ScrapeFileMessageHandlerTest extends TestCase
         $metadata->expects($this->once())->method('write');
 
         $scraper = $this->createStub(ScraperInterface::class);
-        $scraper->method('getName')->willReturn('Dummy');
+        $scraper->method('getName')->willReturn('Fake');
         $scraper->method('scrape')->willReturn(new ComicInfo(series: 'Spawn'));
 
         $chain = $this->createStub(ScraperChain::class);
@@ -59,7 +59,7 @@ class ScrapeFileMessageHandlerTest extends TestCase
         $settings->method('get')->willReturn('1');
 
         $handler = new ScrapeFileMessageHandler($em, $libraryService, $metadata, $chain, $settings);
-        $handler(new ScrapeFileMessage(1, 'test.cbz', 'Dummy', 'dummy:spawn'));
+        $handler(new ScrapeFileMessage(1, 'test.cbz', 'Fake', 'fake:spawn'));
 
         $this->assertSame([Task::STATUS_PENDING, Task::STATUS_PROCESSING], $criteria['status']);
         $this->assertSame(Task::STATUS_COMPLETED, $task->getStatus());
@@ -81,6 +81,6 @@ class ScrapeFileMessageHandlerTest extends TestCase
             $this->createStub(ScraperChain::class),
             $this->createStub(SettingsService::class),
         );
-        $handler(new ScrapeFileMessage(1, 'test.cbz', 'Dummy', 'dummy:spawn'));
+        $handler(new ScrapeFileMessage(1, 'test.cbz', 'Fake', 'fake:spawn'));
     }
 }
