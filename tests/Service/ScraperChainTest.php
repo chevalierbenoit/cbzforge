@@ -29,15 +29,15 @@ class ScraperChainTest extends TestCase
 
     public function testFindScraperByUrlReturnsMatchingScraper(): void
     {
-        $bdgest = $this->createMock(ScraperInterface::class);
-        $bdgest->method('getName')->willReturn('BDGest');
-        $bdgest->expects($this->once())->method('supports')->with('https://www.bdgest.com/album/123')->willReturn(true);
+        $bedetheque = $this->createMock(ScraperInterface::class);
+        $bedetheque->method('getName')->willReturn('Bedetheque');
+        $bedetheque->expects($this->once())->method('supports')->with('https://www.bedetheque.com/album/123')->willReturn(true);
 
-        $chain = new ScraperChain([$bdgest]);
-        $found = $chain->findScraperForUrl('https://www.bdgest.com/album/123');
+        $chain = new ScraperChain([$bedetheque]);
+        $found = $chain->findScraperForUrl('https://www.bedetheque.com/album/123');
 
         $this->assertNotNull($found);
-        $this->assertSame('BDGest', $found->getName());
+        $this->assertSame('Bedetheque', $found->getName());
     }
 
     public function testFindScraperByUrlReturnsNullWhenNoMatch(): void
@@ -52,13 +52,13 @@ class ScraperChainTest extends TestCase
         $scraper1->method('getName')->willReturn('Google Books');
         $scraper1->method('getConfigFields')->willReturn([]);
         $scraper2 = $this->createStub(ScraperInterface::class);
-        $scraper2->method('getName')->willReturn('BDGest');
+        $scraper2->method('getName')->willReturn('Bedetheque');
         $scraper2->method('getConfigFields')->willReturn([]);
 
         $settings = $this->createStub(SettingsService::class);
-        // BDGest disabled (enabled=0), Google Books enabled (no value yet)
+        // Bedetheque disabled (enabled=0), Google Books enabled (no value yet)
         $settings->method('get')->willReturnMap([
-            ['scraper.BDGest.enabled', '0'],
+            ['scraper.Bedetheque.enabled', '0'],
             ['scraper.Google Books.enabled', null],
         ]);
 

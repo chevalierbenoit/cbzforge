@@ -3,25 +3,26 @@
 namespace App\Tests\Scraper;
 
 use App\Model\ComicInfo;
-use App\Scraper\BdgestScraper;
+use App\Scraper\BedethequeScraper;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
-class BdgestScraperTest extends TestCase
+class BedethequeScraperTest extends TestCase
 {
     public function testGetName(): void
     {
-        $scraper = new BdgestScraper(new MockHttpClient());
-        $this->assertSame('BDGest', $scraper->getName());
+        $scraper = new BedethequeScraper(new MockHttpClient());
+        $this->assertSame('Bedetheque', $scraper->getName());
     }
 
-    public function testSupportsBdgestUrl(): void
+    public function testSupportsBedethequeUrl(): void
     {
-        $scraper = new BdgestScraper(new MockHttpClient());
-        $this->assertTrue($scraper->supports('https://www.bdgest.com/album/123'));
-        $this->assertTrue($scraper->supports('https://bdgest.com/album/456'));
+        $scraper = new BedethequeScraper(new MockHttpClient());
+        $this->assertTrue($scraper->supports('https://www.bedetheque.com/album/123'));
+        $this->assertTrue($scraper->supports('https://www.bedetheque.com/album/456'));
         $this->assertFalse($scraper->supports('https://comicvine.com/issue/789'));
+        $this->assertFalse($scraper->supports('https://www.bdgest.com/album/789'));
     }
 
     public function testSearchReturnsScrapeResults(): void
@@ -50,7 +51,7 @@ HTML;
             new MockResponse($seriesPageHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $results = $scraper->search('Largo Winch');
 
         $this->assertCount(2, $results);
@@ -98,7 +99,7 @@ HTML;
             new MockResponse($html, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('/BD-Spawn-Tome-1-Origines-1234.html');
 
         $this->assertInstanceOf(ComicInfo::class, $info);
@@ -145,7 +146,7 @@ HTML;
             new MockResponse($html, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('/BD-Pourpre-Sang-Tome-1-Le-Cercle-de-Nimuee-538892.html');
 
         $this->assertSame('Pourpre-Sang', $info->series);
@@ -183,7 +184,7 @@ HTML;
             new MockResponse($seriesPageHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $results = $scraper->search('Largo Winch 4');
 
         $this->assertCount(1, $results);
@@ -213,7 +214,7 @@ HTML;
             new MockResponse($seriesPageHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $results = $scraper->search('Largo Winch Tome 4');
 
         $this->assertCount(1, $results);
@@ -243,7 +244,7 @@ HTML;
             new MockResponse($seriesPageHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $results = $scraper->search('Le crépuscule des dieux');
 
         $this->assertCount(1, $results);
@@ -257,7 +258,7 @@ HTML;
             new MockResponse($ajaxJson, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $results = $scraper->search('XyzzyNonexistent');
 
         $this->assertCount(0, $results);
@@ -269,7 +270,7 @@ HTML;
             new MockResponse('', ['http_code' => 500]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $results = $scraper->search('Spawn');
 
         $this->assertCount(0, $results);
@@ -301,7 +302,7 @@ HTML;
             new MockResponse($seriesPageHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $results = $scraper->search('Largo Winch');
 
         $this->assertCount(1, $results);
@@ -355,7 +356,7 @@ HTML;
             new MockResponse($albumHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('https://www.bedetheque.com/serie-123-BD-Spawn.html');
 
         $this->assertInstanceOf(ComicInfo::class, $info);
@@ -386,7 +387,7 @@ HTML;
             new MockResponse($seriesHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('https://www.bedetheque.com/serie-123-BD-Spawn.html');
 
         $this->assertInstanceOf(ComicInfo::class, $info);
@@ -442,7 +443,7 @@ HTML;
             new MockResponse($albumHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('https://www.bedetheque.com/serie-123-BD-Spawn.html');
 
         $this->assertInstanceOf(ComicInfo::class, $info);
@@ -498,7 +499,7 @@ HTML;
             new MockResponse($albumHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('https://www.bedetheque.com/serie-123-BD-Spawn.html');
 
         $this->assertInstanceOf(ComicInfo::class, $info);
@@ -534,7 +535,7 @@ HTML;
             new MockResponse($html, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('/BD-Test-123.html');
 
         $this->assertSame(42, $info->number);
@@ -565,7 +566,7 @@ HTML;
             new MockResponse($html, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('/BD-Test-123.html');
 
         $this->assertNull($info->number);
@@ -602,7 +603,7 @@ HTML;
             new MockResponse($html, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('/BD-Test-123.html');
 
         $this->assertSame('The Writer', $info->writer);
@@ -635,7 +636,7 @@ HTML;
             new MockResponse($html, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('/BD-Test-123.html');
 
         $this->assertSame('John Doe', $info->writer);
@@ -665,7 +666,7 @@ HTML;
             new MockResponse($html, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $info = $scraper->scrape('/BD-Test-123.html');
 
         $this->assertSame('Fallback Publisher', $info->publisher);
@@ -673,13 +674,13 @@ HTML;
 
     public function testGetConfigFields(): void
     {
-        $scraper = new BdgestScraper(new MockHttpClient());
+        $scraper = new BedethequeScraper(new MockHttpClient());
         $this->assertSame([], $scraper->getConfigFields());
     }
 
     public function testNormalizeAuthorNameNonMatching(): void
     {
-        $scraper = new BdgestScraper(new MockHttpClient());
+        $scraper = new BedethequeScraper(new MockHttpClient());
         $reflection = new \ReflectionClass($scraper);
         $method = $reflection->getMethod('normalizeAuthorName');
         $result = $method->invoke($scraper, 'John Doe');
@@ -688,7 +689,7 @@ HTML;
 
     public function testInvertArticle(): void
     {
-        $scraper = new BdgestScraper(new MockHttpClient());
+        $scraper = new BedethequeScraper(new MockHttpClient());
         $reflection = new \ReflectionClass($scraper);
         $method = $reflection->getMethod('invertArticle');
 
@@ -716,7 +717,7 @@ HTML;
             new MockResponse($seriesPageHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $results = $scraper->search('Largo Winch');
 
         $this->assertCount(0, $results);
@@ -744,7 +745,7 @@ HTML;
             new MockResponse($seriesPageHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $results = $scraper->search('Largo Winch');
 
         $this->assertCount(1, $results);
@@ -773,7 +774,7 @@ HTML;
             new MockResponse($seriesPageHtml, ['http_code' => 200]),
         ]);
 
-        $scraper = new BdgestScraper($client);
+        $scraper = new BedethequeScraper($client);
         $results = $scraper->search('Largo Winch');
 
         $this->assertCount(1, $results);
@@ -782,7 +783,7 @@ HTML;
 
     public function testGetXpathTextWithContext(): void
     {
-        $scraper = new BdgestScraper(new MockHttpClient());
+        $scraper = new BedethequeScraper(new MockHttpClient());
         $reflection = new \ReflectionClass($scraper);
         $method = $reflection->getMethod('getXpathText');
 

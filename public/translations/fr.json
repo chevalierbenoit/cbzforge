@@ -18,7 +18,7 @@
     "js.scrape.metadata_imported": "Métadonnées importées.",
     "js.scrape.metadata_read_error": "Impossible de lire les métadonnées",
     "js.scrape.scrape_url": "Scraper par URL",
-    "js.scrape.url_placeholder": "URL de la fiche BDGest :",
+    "js.scrape.url_placeholder": "URL de la fiche Bedetheque :",
     "js.scrape.enter_url": "Veuillez entrer une URL.",
     "js.scrape.scraping_url": "Scraping par URL...",
     "js.scrape.scraping": "Scraping...",

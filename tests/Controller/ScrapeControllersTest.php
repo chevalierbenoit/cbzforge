@@ -4,7 +4,7 @@ namespace App\Tests\Controller;
 
 use App\Entity\Library;
 use App\Entity\Setting;
-use App\Scraper\BdgestScraper;
+use App\Scraper\BedethequeScraper;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpClient\Exception\TransportException;
 use Symfony\Component\HttpClient\MockHttpClient;
@@ -572,8 +572,8 @@ class ScrapeControllersTest extends WebTestCase
         $mockClient = new MockHttpClient(static function () {
             throw new TransportException('Connection timeout');
         });
-        $bdGestScraper = new BdgestScraper($mockClient);
-        $container->set(BdgestScraper::class, $bdGestScraper);
+        $bdGestScraper = new BedethequeScraper($mockClient);
+        $container->set(BedethequeScraper::class, $bdGestScraper);
 
         $em = $container->get('doctrine.orm.entity_manager');
         $library = new Library();
@@ -585,8 +585,8 @@ class ScrapeControllersTest extends WebTestCase
         $client->request('POST', '/api/files/scrape/confirm', [], [], [
             'CONTENT_TYPE' => 'application/json',
         ], json_encode([
-            'confirm_identifier' => 'https://bdgest.com/album/test',
-            'scraper' => 'BDGest',
+            'confirm_identifier' => 'https://www.bedetheque.com/album/test',
+            'scraper' => 'Bedetheque',
             'library_id' => $library->getId(),
             'path' => 'test.cbz',
         ]));

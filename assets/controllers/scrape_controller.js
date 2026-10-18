@@ -19,7 +19,7 @@ export default class extends Controller {
     static targets = ['modalContent', 'modalFooter'];
     static values = {
         libraryId: Number,
-        scrapers: { type: Array, default: ['BDGest'] },
+        scrapers: { type: Array, default: ['Bedetheque'] },
         locale: String,
     };
 
@@ -28,7 +28,7 @@ export default class extends Controller {
     _currentPath = null;
     _searchFiles = [];
     _searchIndex = 0;
-    _searchScraper = 'BDGest';
+    _searchScraper = 'Bedetheque';
     _searchSuccess = 0;
     _searchSkipped = 0;
     _searchDefaultQuery = null;
@@ -51,7 +51,7 @@ export default class extends Controller {
 
         this._searchFiles = [path];
         this._searchIndex = 0;
-        this._searchScraper = this.scrapersValue[0] || 'BDGest';
+        this._searchScraper = this.scrapersValue[0] || 'Bedetheque';
         this._searchSuccess = 0;
         this._searchSkipped = 0;
 
@@ -74,7 +74,7 @@ export default class extends Controller {
 
         this._searchFiles = files;
         this._searchIndex = 0;
-        this._searchScraper = this.scrapersValue[0] || 'BDGest';
+        this._searchScraper = this.scrapersValue[0] || 'Bedetheque';
         this._searchSuccess = 0;
         this._searchSkipped = 0;
         this._pendingScrapeTasks = new Set();
@@ -421,7 +421,7 @@ export default class extends Controller {
                 <div class="search-form">
                     <label for="scrape-url">${this.translator.trans('js.scrape.url_placeholder')}</label>
                     <input type="url" id="scrape-url"
-                            placeholder="https://www.bdgest.com/..."
+                            placeholder="https://www.bedetheque.com/..."
                             value=""
                             style="width: 100%; padding: 0.5rem; margin-top: 0.5rem; border: 1px solid #ddd; border-radius: 4px;">
                     <div id="scrape-url-error" style="color: #c62828; margin-top: 0.5rem; display: none;"></div>

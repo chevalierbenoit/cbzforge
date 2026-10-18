@@ -278,7 +278,7 @@ class AdminControllerTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('body', 'Not configured');
         $this->assertNotNull($crawler->filter('#toggle-Google_Books')->attr('disabled'));
-        $this->assertNull($crawler->filter('#toggle-BDGest')->attr('disabled'));
+        $this->assertNull($crawler->filter('#toggle-Bedetheque')->attr('disabled'));
     }
 
     public function testSettingsPostWithConfigField(): void
