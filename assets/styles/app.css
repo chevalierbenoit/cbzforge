@@ -1072,8 +1072,11 @@ details.metadata-section[open] > summary::after { transform: rotate(-135deg); }
     border-top: 1px solid var(--border);
 }
 
-.number-input-wrapper { display: flex; gap: 0.35rem; align-items: center; }
-.number-input-wrapper input { width: auto; flex: 1; min-width: 0; }
+.number-input-wrapper { display: flex; gap: 0.35rem; align-items: center; min-width: 0; }
+.number-input-wrapper input { width: 100%; flex: 1 1 auto; min-width: 0; }
+
+/* Grid cells must not grow with their content (the input's default width used to push the next field) */
+.metadata-horizontal-grid .form-group { min-width: 0; }
 .btn-number-fill { min-height: 36px; }
 .btn-number-fill:disabled { opacity: 0.5; }
 
