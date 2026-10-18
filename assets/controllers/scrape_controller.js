@@ -741,6 +741,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
                 hasFields = true;
             }
         });
+        const { number: formNumber, ...sharedMetadata } = metadata;
 
         if (!hasFields) {
             this._batchSaving = false;
@@ -760,13 +761,15 @@ _renderBatchForm(common, coverUrl, count, paths) {
             if (statusBar) statusBar.textContent = `${this.translator.trans('js.scrape.batch')} ${i + 1}/${paths.length}  ${filename}`;
 
             try {
+                const number = this._numberFor(path, formNumber);
                 const response = await fetch('/api/files/scrape/update', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         library_id: this.libraryIdValue,
                         path: path,
-                        ...metadata,
+                        ...sharedMetadata,
+                        ...(number !== undefined ? { number } : {}),
                     }),
                 });
 
@@ -800,6 +803,7 @@ _renderBatchForm(common, coverUrl, count, paths) {
         // Clean up batch state
         this._batchSaving = false;
         this._batchErrors = [];
+        this._batchNumbers = null;
     }
 
     closeMetadata(event) {
@@ -896,7 +900,10 @@ _renderBatchForm(common, coverUrl, count, paths) {
         document.body.style.overflow = '';
     }
 
-    async batchAutoNumber(event) {
+    // Auto-number: computes one number per selected file, in the order shown on screen.
+    // The numbers are written by the batch save, with the other fields.
+    batchAutoNumber(event) {
+        if (event) event.preventDefault();
         const numInput = document.querySelector('[name="number"]');
         const baseStr = numInput ? numInput.value.trim() : '';
         if (!baseStr) return;
@@ -910,49 +917,24 @@ _renderBatchForm(common, coverUrl, count, paths) {
         const selected = this._selectedPaths();
         if (selected.length < 2) return;
 
-        const statusBar = document.getElementById('status-bar-text') || document.getElementById('status-bar');
-        let successCount = 0;
-        const errors = [];
+        const numbers = new Map(selected.map((path, i) => [path, String(base + i)]));
+        this._batchNumbers = { base: baseStr, numbers };
 
-        for (let i = 0; i < selected.length; i++) {
-            const path = selected[i];
-            const filename = path.split('/').pop() || path;
-            const number = String(base + i);
-            if (statusBar) statusBar.textContent = `${this.translator.trans('js.scrape.auto_number')} ${i + 1}/${selected.length}  ${filename}`;
+        const summary = selected
+            .map(path => `${path.split('/').pop() || path} → ${numbers.get(path)}`)
+            .join(', ');
+        this._showFlash({ type: 'info', text: `${this.translator.trans('js.scrape.numbers_ready')} ${summary}` });
+    }
 
-            try {
-                const response = await fetch('/api/files/scrape/update', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        library_id: this.libraryIdValue,
-                        path: path,
-                        number: number,
-                    }),
-                });
-                if (!response.ok) throw new Error(this.translator.trans('js.scrape.save_error'));
-                const result = await response.json();
-                if (result.written) {
-                    successCount++;
-                    const cards = document.querySelectorAll(`.file-card[data-scrape-path-param="${CSS.escape(path)}"]`);
-                    cards.forEach(card => {
-                        const badge = card.querySelector('.badge');
-                        if (badge) {
-                            setMetadataBadge(badge, 'ok', this.translator);
-                        }
-                    });
-                }
-            } catch (error) {
-                errors.push(`${escapeHtml(filename)}: ${escapeHtml(error.message)}`);
-            }
+    // The number for one file: from the auto-number plan when it matches the current base
+    // number, otherwise the number typed in the form (the same for every file).
+    _numberFor(path, formNumber) {
+        const plan = this._batchNumbers;
+        const currentBase = document.querySelector('[name="number"]')?.value.trim() ?? '';
+        if (plan && plan.base === currentBase && plan.numbers.has(path)) {
+            return plan.numbers.get(path);
         }
-
-        if (statusBar) statusBar.textContent = '';
-
-        this._showFlash(errors.length === 0
-            ? { type: 'success', text: `${successCount} ${successCount > 1 ? this.translator.trans('js.scrape.files_updated') : this.translator.trans('js.scrape.file_updated')}.` }
-            : { type: 'warning', text: `${successCount}/${selected.length} ${this.translator.trans('js.scrape.files_updated')}, ${errors.length} ${errors.length > 1 ? this.translator.trans('js.scrape.errors') : this.translator.trans('js.scrape.error')}.` }
-        );
+        return formNumber;
     }
 
     async skipResult(event) {
