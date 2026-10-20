@@ -47,8 +47,8 @@ COPY --chown=www-data:www-data . .
 
 COPY docker/php.ini /usr/local/etc/php/conf.d/app.ini
 
-RUN composer dump-autoload --no-dev --optimize --classmap-authoritative \
-    && composer dump-env prod
+# The secret is not compiled into the image: the entrypoint provides it per installation.
+RUN composer dump-autoload --no-dev --optimize --classmap-authoritative
 
 RUN mkdir -p var/cache/prod var/log public/assets "${XDG_CONFIG_HOME}" "${XDG_DATA_HOME}" \
     && chown -R www-data:www-data /app/var /app/public/assets
