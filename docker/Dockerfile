@@ -28,11 +28,18 @@ RUN apk add --no-cache \
     libzip-dev \
     freetype-dev libjpeg-turbo-dev libpng-dev \
     caddy poppler-utils supervisor \
+    curl \
     libstdc++ \
     && apk add --no-cache su-exec \
     && docker-php-ext-install zip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd
+
+# Run as UID/GID 568 (the TrueNAS apps user). The entrypoint still remaps www-data
+# to HOST_UID/HOST_GID when the container starts as root (docker compose dev setup).
+RUN sed -i 's/^www-data:x:82:82:/www-data:x:568:568:/' /etc/passwd \
+    && sed -i 's/^www-data:x:82:/www-data:x:568:/' /etc/group \
+    && test "$(id -u www-data)" = 568
 
 COPY --from=unrar /usr/local/bin/unrar /usr/local/bin/unrar
 
@@ -62,6 +69,7 @@ RUN test -s public/assets/manifest.json \
 
 COPY docker/entrypoint.sh /entrypoint.sh
 COPY docker/supervisord.conf /etc/supervisord.conf
+COPY docker/supervisord-nonroot.conf /etc/supervisord-nonroot.conf
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

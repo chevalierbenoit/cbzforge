@@ -2,6 +2,7 @@
 .idea
 .superpowers
 var/data.db
+var/test.db
 var/cache
 var/log
 vendor/

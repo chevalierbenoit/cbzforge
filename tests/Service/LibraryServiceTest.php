@@ -118,6 +118,80 @@ class LibraryServiceTest extends TestCase
         $this->assertSame(['alpha.cbz', 'beta.cbz', 'test2.cbr', 'zeta.cbz'], $names);
     }
 
+    public function testFindFirstCoverablePrefersFilesOfTheFolderItself(): void
+    {
+        $library = new Library();
+        $library->setPath($this->tmpDir);
+
+        $service = new LibraryService();
+
+        $this->assertSame('test2.cbr', $service->findFirstCoverable($library, ''));
+    }
+
+    public function testFindFirstCoverableLooksInSubfolders(): void
+    {
+        $library = new Library();
+        $library->setPath($this->tmpDir);
+
+        $service = new LibraryService();
+
+        $this->assertSame('Serie1/test.cbz', $service->findFirstCoverable($library, 'Serie1'));
+    }
+
+    public function testFindFirstCoverableIgnoresFilesWithoutCover(): void
+    {
+        mkdir($this->tmpDir.'/Epub');
+        touch($this->tmpDir.'/Epub/book.epub');
+
+        $library = new Library();
+        $library->setPath($this->tmpDir);
+
+        $service = new LibraryService();
+
+        $this->assertNull($service->findFirstCoverable($library, 'Epub'));
+    }
+
+    public function testFindFirstCoverableStopsAtMaxDepth(): void
+    {
+        mkdir($this->tmpDir.'/a/b/c/d', 0777, true);
+        touch($this->tmpDir.'/a/b/c/d/deep.cbz');
+
+        $library = new Library();
+        $library->setPath($this->tmpDir);
+
+        $service = new LibraryService();
+
+        $this->assertNull($service->findFirstCoverable($library, 'a'));
+        $this->assertSame('a/b/c/d/deep.cbz', $service->findFirstCoverable($library, 'a', 5));
+    }
+
+    public function testCountCoverableIncludesSubfolders(): void
+    {
+        touch($this->tmpDir.'/Serie1/second.cbz');
+        mkdir($this->tmpDir.'/Serie1/Tome 2/sub', 0777, true);
+        touch($this->tmpDir.'/Serie1/Tome 2/sub/third.pdf');
+        touch($this->tmpDir.'/Serie1/Tome 2/notes.txt');
+        touch($this->tmpDir.'/Serie1/Tome 2/book.epub');
+
+        $library = new Library();
+        $library->setPath($this->tmpDir);
+
+        $service = new LibraryService();
+
+        $this->assertSame(3, $service->countCoverable($library, 'Serie1'));
+        $this->assertSame(0, $service->countCoverable($library, 'nonexistent'));
+    }
+
+    public function testFindFirstCoverableReturnsNullForMissingFolder(): void
+    {
+        $library = new Library();
+        $library->setPath($this->tmpDir);
+
+        $service = new LibraryService();
+
+        $this->assertNull($service->findFirstCoverable($library, 'nonexistent'));
+    }
+
     protected function tearDown(): void
     {
         $this->rrmdir($this->tmpDir);

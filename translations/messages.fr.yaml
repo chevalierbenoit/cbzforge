@@ -21,6 +21,8 @@ explore.no_files: Aucun fichier dans ce dossier.
 explore.select_file: Sélectionnez un fichier pour voir ses métadonnées
 explore.file: fichier
 explore.folder: dossier
+explore.volume: volume
+explore.volumes: volumes
 explore.close: Fermer
 
 # Admin — Libraries

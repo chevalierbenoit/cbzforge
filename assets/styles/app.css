@@ -916,11 +916,59 @@ tr.selected td { background: var(--accent-soft); }
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--accent-soft);
+    background: var(--surface-2);
     color: var(--accent);
 }
 
 .folder-card-icon .icon { width: 2.5rem; height: 2.5rem; }
+
+/* The first comic's cover, with two sheets fanned out behind it to read as a stack */
+.folder-cover-stack {
+    position: relative;
+    width: 78%;
+    aspect-ratio: 2 / 3;
+}
+
+.folder-cover-stack::before,
+.folder-cover-stack::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.folder-cover-stack::before { transform: rotate(-4deg) translate(-5px, 2px); }
+.folder-cover-stack::after { transform: rotate(3deg) translate(5px, 1px); }
+
+.folder-cover-stack img {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-lg);
+}
+
+/* No readable file in the folder: plain folder icon, no stack */
+.folder-card-fallback { display: none; }
+
+.folder-cover-stack.is-empty {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.folder-cover-stack.is-empty::before,
+.folder-cover-stack.is-empty::after,
+.folder-cover-stack.is-empty img { display: none; }
+.folder-cover-stack.is-empty .folder-card-fallback { display: flex; }
 
 .file-card-body,
 .folder-card .file-card-body {
@@ -1261,13 +1309,61 @@ details.metadata-section[open] > summary::after { transform: rotate(-135deg); }
     min-height: calc(100vh - var(--header-h));
     display: grid;
     place-items: center;
-    padding: 2rem 1rem;
+    padding: 2.5rem 1rem;
+    background:
+        radial-gradient(60rem 28rem at 50% -8rem, var(--accent-soft), transparent 70%),
+        var(--bg);
 }
 
-.auth-card { width: min(420px, 100%); }
-.auth-card .card-body { display: grid; gap: 0.25rem; }
+.auth-stack {
+    width: min(420px, 100%);
+    display: grid;
+    gap: 1.5rem;
+}
+
+.auth-brand {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.auth-brand-mark { filter: drop-shadow(0 8px 16px rgba(67, 56, 202, 0.25)); }
+
+.auth-brand-name {
+    font-size: 1.375rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+}
+
+.auth-card {
+    width: 100%;
+    border-top: 3px solid var(--accent);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+}
+
+.auth-card .card-header {
+    justify-content: center;
+    border-bottom: none;
+    padding: 1.5rem 1.5rem 0;
+}
+
+.auth-card .card-header h1 { font-size: 1.25rem; text-align: center; }
+.auth-card .card-body { padding: 1.25rem 1.5rem; display: grid; gap: 0.25rem; }
+.auth-card .card-body .page-lead { text-align: center; margin: 0 0 0.5rem; max-width: none; }
 .auth-card .form-group { margin-bottom: 0.75rem; }
-.auth-card input[type="text"], .auth-card input[type="password"] { width: 100%; }
+.auth-card .form-group label { font-weight: 600; font-size: 0.875rem; color: var(--text-2); }
+.auth-card input[type="text"], .auth-card input[type="password"] { width: 100%; min-height: 40px; }
+.auth-card .card-footer {
+    display: block;
+    padding: 0.5rem 1.5rem 1.5rem;
+    background: none;
+    border-top: none;
+    border-radius: 0;
+}
+.auth-card .card-footer .btn { width: 100%; min-height: 42px; font-size: 1rem; }
 
 .page-narrow { max-width: 640px; }
 

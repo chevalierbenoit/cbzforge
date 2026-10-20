@@ -47,7 +47,9 @@ docker compose exec app php bin/console <command>
 
 The container runs PHP-FPM, Caddy and the background worker (`messenger:consume`), supervised by supervisord.
 
-The container runs as `www-data`, with its UID and GID aligned on your host user through `HOST_UID` and `HOST_GID`. This keeps the mounted files accessible.
+The image runs as UID/GID 568 by default, the user used by TrueNAS apps. The volume and mounted libraries must be writable by that user.
+
+When started as root (the docker compose setup in this repository), the entrypoint instead aligns `www-data` on your host user through `HOST_UID` and `HOST_GID`, so the mounted files stay accessible.
 
 ### Without Docker
 

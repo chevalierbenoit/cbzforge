@@ -21,6 +21,8 @@ explore.no_files: No files in this folder.
 explore.select_file: Select a file to view its metadata
 explore.file: file
 explore.folder: folder
+explore.volume: volume
+explore.volumes: volumes
 explore.close: Close
 
 # Admin — Libraries

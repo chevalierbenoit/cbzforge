@@ -52,6 +52,37 @@ class CoverController extends AbstractController
         }
     }
 
+    /** Cover of the first comic in a folder, shown as the folder's thumbnail. */
+    #[Route('/api/folders/cover', name: 'folder_cover', methods: ['GET'])]
+    public function folder(Request $request): Response
+    {
+        $libraryId = $request->query->get('library_id');
+        $path = $request->query->get('path', '');
+
+        $library = $libraryId ? $this->em->getRepository(Library::class)->find($libraryId) : null;
+        if (!$library) {
+            throw $this->createNotFoundException('Library not found');
+        }
+
+        try {
+            $coverPath = $this->libraryService->findFirstCoverable($library, $path);
+            $image = null !== $coverPath
+                ? $this->coverService->getCover($this->libraryService->getFullPath($library, $coverPath))
+                : null;
+        } catch (\InvalidArgumentException) {
+            $image = null;
+        }
+
+        if (!$image) {
+            throw $this->createNotFoundException('No cover in this folder');
+        }
+
+        return new Response($image['content'], 200, [
+            'Content-Type' => $image['mime'],
+            'Cache-Control' => 'private, max-age=3600',
+        ]);
+    }
+
     private function renderErrorCover(): Response
     {
         $svg = $this->renderView('scrape/error_cover.svg.twig');
