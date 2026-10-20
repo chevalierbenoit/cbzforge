@@ -7,6 +7,7 @@ use App\Entity\Library;
 class LibraryService
 {
     private const ALLOWED_EXTENSIONS = ['cbz', 'cbr', 'pdf', 'epub'];
+    private const COVERABLE_EXTENSIONS = ['cbz', 'cbr', 'pdf'];
 
     /** @return array{name: string, path: string, type: string, extension: string|null}[] */
     public function getEntries(Library $library, string $subPath): array
@@ -51,6 +52,62 @@ class LibraryService
             : ('dir' === $a['type'] ? -1 : 1));
 
         return $entries;
+    }
+
+    /**
+     * Relative path of the first comic or PDF found in a folder, looking in the folder
+     * itself before its subfolders. The search stops at $maxDepth levels, so a huge
+     * tree cannot slow the explorer down.
+     */
+    public function findFirstCoverable(Library $library, string $subPath, int $maxDepth = 3): ?string
+    {
+        try {
+            $entries = $this->getEntries($library, $subPath);
+        } catch (\InvalidArgumentException) {
+            return null;
+        }
+
+        foreach ($entries as $entry) {
+            if ('file' === $entry['type'] && \in_array($entry['extension'], self::COVERABLE_EXTENSIONS, true)) {
+                return $entry['path'];
+            }
+        }
+
+        if ($maxDepth <= 1) {
+            return null;
+        }
+
+        foreach ($entries as $entry) {
+            if ('dir' === $entry['type']) {
+                $found = $this->findFirstCoverable($library, $entry['path'], $maxDepth - 1);
+                if (null !== $found) {
+                    return $found;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /** Number of comics and PDFs in a folder and all its subfolders. */
+    public function countCoverable(Library $library, string $subPath): int
+    {
+        try {
+            $entries = $this->getEntries($library, $subPath);
+        } catch (\InvalidArgumentException) {
+            return 0;
+        }
+
+        $count = 0;
+        foreach ($entries as $entry) {
+            if ('file' === $entry['type'] && \in_array($entry['extension'], self::COVERABLE_EXTENSIONS, true)) {
+                ++$count;
+            } elseif ('dir' === $entry['type']) {
+                $count += $this->countCoverable($library, $entry['path']);
+            }
+        }
+
+        return $count;
     }
 
     public function getFullPath(Library $library, string $subPath): string

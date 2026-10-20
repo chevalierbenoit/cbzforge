@@ -76,9 +76,17 @@
             <div class="file-grid">
                 {% for entry in dirs %}
                 <a class="folder-card" href="{{ path('library_explore', {id: library.id, path: entry.path}) }}">
-                    <div class="folder-card-icon">{{ ui.icon('folder') }}</div>
+                    <div class="folder-card-icon">
+                        <div class="folder-cover-stack">
+                            <img src="{{ path('folder_cover', {path: entry.path, library_id: library.id}) }}" alt=""
+                                 loading="lazy"
+                                 onerror="this.parentElement.classList.add('is-empty')">
+                            <div class="folder-card-fallback">{{ ui.icon('folder') }}</div>
+                        </div>
+                    </div>
                     <div class="file-card-body">
                         <div class="file-card-name">{{ entry.name }}</div>
+                        <span class="badge badge-neutral">{{ entry.volume_count }} {{ (entry.volume_count == 1 ? 'explore.volume' : 'explore.volumes')|trans }}</span>
                     </div>
                 </a>
                 {% endfor %}

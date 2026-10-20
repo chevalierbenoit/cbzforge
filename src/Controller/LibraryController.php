@@ -41,6 +41,10 @@ class LibraryController extends AbstractController
             } else {
                 $entry['has_metadata'] = null;
             }
+
+            $entry['volume_count'] = 'dir' === $entry['type']
+                ? $this->libraryService->countCoverable($library, $entry['path'])
+                : null;
         }
         unset($entry);
 
