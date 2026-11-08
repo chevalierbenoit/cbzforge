@@ -62,6 +62,11 @@ if [ ! -f /app/public/assets/importmap.json ]; then
     $RUN php bin/console importmap:install --no-interaction
 fi
 
+# The cache lives in the persistent /app/var volume and prod does not revalidate it:
+# clear it on every start so a new image never serves templates compiled by an older one.
+echo "--> [setup] Clearing the Symfony cache..."
+$RUN php bin/console cache:clear --no-interaction
+
 # Supervisord must stay root so it can open /dev/stdout dispatchers
 # (a root-owned pipe); it drops each program to www-data via "user=".
 exec "$@"
