@@ -30,10 +30,13 @@ RUN apk add --no-cache \
     caddy poppler-utils supervisor \
     curl \
     libstdc++ \
+    icu-libs \
+    && apk add --no-cache --virtual .build-intl icu-dev \
     && apk add --no-cache su-exec \
     && docker-php-ext-install zip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install gd
+    && docker-php-ext-install gd intl \
+    && apk del .build-intl
 
 # Run as UID/GID 568 (the TrueNAS apps user). The entrypoint still remaps www-data
 # to HOST_UID/HOST_GID when the container starts as root (docker compose dev setup).
